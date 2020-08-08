@@ -14,7 +14,6 @@ main =
     Browser.sandbox { init = init, update = update, view = view }
 
 
-
 -- MODEL
 
 
@@ -40,7 +39,9 @@ type alias Prices =
 type alias Model =
     { actors : List Actor
     , prices : Prices
+    , currentPane : String
     }
+
 
 
 newPriceVector : Prices
@@ -50,20 +51,20 @@ newPriceVector =
 
 init : Model
 init =
-    Model [] newPriceVector
+    Model [] newPriceVector ""
 
 
-newActor : Actor
-newActor =
-    Actor 0 "" 0 0 0.0 0.0 0.0 0.0 0.0
-
+newActor : Int -> Actor
+newActor n =
+    Actor n "" 0 0 0.0 0.0 0.0 0.0 0.0
 
 
 -- UPDATE
 
-
 type Msg
     = AddActor Actor
+    | ShowAddActorPane
+    | ShowEditActorPane
 
 
 update : Msg -> Model -> Model
@@ -71,7 +72,10 @@ update msg model =
     case msg of
         AddActor a ->
             { model | actors = a :: model.actors }
-
+        ShowAddActorPane ->
+            { model | currentPane = "AddActor" }
+        ShowEditActorPane ->
+            { model | currentPane = "EditActor" }
 
 
 -- VIEW
@@ -81,7 +85,13 @@ view : Model -> Html Msg
 view model =
     div []
         [ button
-            [ onClick (AddActor newActor) ]
+            [ onClick (AddActor <| newActor <| List.length model.actors + 1) ]
             [ text "Add Actor" ]
+        , button 
+            [ onClick ShowAddActorPane ]
+            [ text "Add Actor pane"]
+        , button 
+            [ onClick ShowEditActorPane ]
+            [ text "Edit Actor pane"]
         , p [] [ text (toString model) ]
         ]
