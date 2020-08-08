@@ -6,11 +6,14 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value)
 import Debug exposing (toString)
 
+
 -- MAIN
 
 
 main =
     Browser.sandbox { init = init, update = update, view = view }
+
+
 
 -- MODEL
 
@@ -70,6 +73,7 @@ type Msg
     | SelectCc String
     | SelectWc String
 
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of
@@ -88,33 +92,40 @@ update msg model =
         ShowEditActorPane ->
             { model | currentPane = "EditActor" }
 
+
+
 -- VIEW
+
 
 viewAddActorForm : Model -> Html Msg
 viewAddActorForm model =
-  div [] 
-  [ p [] [ text (toString model) ]
-  , p [] [text "What consumer council do you want to join?"]
-  , select [ onInput SelectCc ]
-    [ option [value ""]  [text "Choose a consumer council:"]
-    , option [value "1"] [text "1"]
-    , option [value "2"] [text "2"]
-    , option [value "3"] [text "3"]
-    ]
-  , p [] [ text "What worker council do you want to join?" ]
-  , select [ onInput SelectWc ]
-    [ option [value ""] [text "Choose a worker council:"]
-    , option [value "pizza"] [ text "pizza"]
-    , option [value "beer"] [ text "beer"]
-    ]
-  , p [] []
-  , button
-    [ onClick (AddActor <| newActor (List.length model.actors + 1)
-                                  model.tempCc
-                                  model.tempWc
-                                  0.0) ]
-    [ text "Add Actor" ] 
-  ]
+    div []
+        [ p [] [ text (toString model) ]
+        , p [] [ text "What consumer council do you want to join?" ]
+        , select [ onInput SelectCc ]
+            [ option [ value "" ] [ text "Choose a consumer council:" ]
+            , option [ value "1" ] [ text "1" ]
+            , option [ value "2" ] [ text "2" ]
+            , option [ value "3" ] [ text "3" ]
+            ]
+        , p [] [ text "What worker council do you want to join?" ]
+        , select [ onInput SelectWc ]
+            [ option [ value "" ] [ text "Choose a worker council:" ]
+            , option [ value "pizza" ] [ text "pizza" ]
+            , option [ value "beer" ] [ text "beer" ]
+            ]
+        , p [] []
+        , button
+            [ onClick
+                (AddActor <|
+                    newActor (List.length model.actors + 1)
+                        model.tempCc
+                        model.tempWc
+                        0.0
+                )
+            ]
+            [ text "Add Actor" ]
+        ]
 
 
 view : Model -> Html Msg
