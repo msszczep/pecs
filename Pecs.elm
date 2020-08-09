@@ -9,8 +9,11 @@ import Debug exposing (toString)
 
 -- MAIN
 
+
 main =
     Browser.sandbox { init = init, update = update, view = view }
+
+
 
 -- MODEL
 
@@ -26,6 +29,7 @@ type alias Actor =
     , hoursToWork : Float
     , maxLeisureTime : Float
     }
+
 
 type alias Prices =
     { pizza : Float
@@ -59,6 +63,7 @@ newActor i name cc wc ct =
     Actor i name cc wc 0.0 0.0 ct 0.0 0.0
 
 
+
 -- UPDATE
 
 
@@ -70,6 +75,7 @@ type Msg
     | SelectCc String
     | SelectWc String
     | EnterName String
+
 
 update : Msg -> Model -> Model
 update msg model =
@@ -95,30 +101,43 @@ update msg model =
         ShowCouncilsPane ->
             { model | currentPane = "ShowCouncils" }
 
+
+
 -- VIEW
 
+
 viewCouncils : Model -> Html Msg
-viewCouncils model = 
-   let
-      pizzas = List.filter (\c -> c.wc == "pizza") model.actors |> List.map (\x -> x.name)
-      beers = List.filter (\c -> c.wc == "beer") model.actors |> List.map (\x -> x.name)
-      ones = List.filter (\c -> c.cc == "1") model.actors |> List.map (\x -> x.name)
-      twos = List.filter (\c -> c.cc == "2") model.actors |> List.map (\x -> x.name)
-      threes = List.filter (\c -> c.cc == "3") model.actors |> List.map (\x -> x.name)
-   in
-       div [] 
-          [ p [] [ text "Workers Council - Pizza:" ] 
-          , p [] [ text (toString pizzas) ]
-          , p [] [ text "Workers Council - Beer:" ]
-          , p [] [ text (toString beers) ]
-          , p [] [ text "==========================================" ]
-          , p [] [ text "Consumers Council - One:" ]
-          , p [] [ text (toString ones) ]
-          , p [] [ text "Consumers Council - Two:" ]
-          , p [] [ text (toString twos) ]
-          , p [] [ text "Consumers Council - Three:" ]
-          , p [] [ text (toString threes) ]
-          ]
+viewCouncils model =
+    let
+        pizzas =
+            List.filter (\c -> c.wc == "pizza") model.actors |> List.map (\x -> x.name)
+
+        beers =
+            List.filter (\c -> c.wc == "beer") model.actors |> List.map (\x -> x.name)
+
+        ones =
+            List.filter (\c -> c.cc == "1") model.actors |> List.map (\x -> x.name)
+
+        twos =
+            List.filter (\c -> c.cc == "2") model.actors |> List.map (\x -> x.name)
+
+        threes =
+            List.filter (\c -> c.cc == "3") model.actors |> List.map (\x -> x.name)
+    in
+        div []
+            [ p [] [ text "Workers Council - Pizza:" ]
+            , p [] [ text (toString pizzas) ]
+            , p [] [ text "Workers Council - Beer:" ]
+            , p [] [ text (toString beers) ]
+            , p [] [ text "==========================================" ]
+            , p [] [ text "Consumers Council - One:" ]
+            , p [] [ text (toString ones) ]
+            , p [] [ text "Consumers Council - Two:" ]
+            , p [] [ text (toString twos) ]
+            , p [] [ text "Consumers Council - Three:" ]
+            , p [] [ text (toString threes) ]
+            ]
+
 
 viewAddActorForm : Model -> Html Msg
 viewAddActorForm model =
@@ -162,9 +181,10 @@ view model =
                     [ button
                         [ onClick ShowAddActorPane ]
                         [ text "Add Actor" ]
---                    , button
---                        [ onClick ShowEditActorPane ]
---                        [ text "Edit Actor pane" ]
+
+                    --                    , button
+                    --                        [ onClick ShowEditActorPane ]
+                    --                        [ text "Edit Actor pane" ]
                     , button
                         [ onClick ShowCouncilsPane ]
                         [ text "Show Councils" ]
@@ -172,13 +192,15 @@ view model =
                 ]
             , td []
                 [ h2 [] [ text "Participatory Economics Classroom Simulator" ]
-                , case model.currentPane of 
-                      "AddActor" ->
-                          viewAddActorForm model
-                      "ShowCouncils" ->
-                          viewCouncils model
-                      _ ->
-                          p [] [ text (toString model) ]
+                , case model.currentPane of
+                    "AddActor" ->
+                        viewAddActorForm model
+
+                    "ShowCouncils" ->
+                        viewCouncils model
+
+                    _ ->
+                        p [] [ text (toString model) ]
                 ]
             ]
         ]
