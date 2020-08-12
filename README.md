@@ -2,4 +2,6 @@
 Participatory Economics Classroom Simulation
 
 TODO:
-* Add edit page
+* Add instructions
+* Add randomizer
+* Fill in edit page

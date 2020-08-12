@@ -5,7 +5,7 @@ import Html exposing (Html, button, div, text, p, table, tr, td, h2, br, input, 
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder)
 import Debug exposing (toString)
-
+import Random
 
 -- MAIN
 
@@ -25,9 +25,9 @@ type alias Actor =
     , wc : String
     , numBeersWanted : Float
     , numPizzasWanted : Float
-    , consumptionThreshold : Float
+    , hiLo : Float
     , hoursToWork : Float
-    , maxLeisureTime : Float
+    , maxLeisureTime : Int
     }
 
 
@@ -44,7 +44,7 @@ type alias Model =
     , tempCc : String
     , tempWc : String
     , tempName : String
-    , tempConsumptionThreshold : Float
+    , tempHiLo : Float
     }
 
 
@@ -58,10 +58,9 @@ init =
     Model [] newPriceVector "" "" "" "" 0.0
 
 
-newActor : Int -> String -> String -> String -> Float -> Actor
-newActor i name cc wc ct =
-    Actor i name cc wc 0.0 0.0 ct 0.0 0.0
-
+newActor : Int -> String -> String -> String -> Int -> Actor
+newActor i name cc wc mlt =
+    Actor i name cc wc 0.0 0.0 0.0 0.0 mlt
 
 
 -- UPDATE
@@ -72,16 +71,18 @@ type Msg
     | ShowAddActorPane
     | ShowEditActorPane
     | ShowCouncilsPane
+    | ShowDebugPane
+    | ShowIterationPane
     | SelectCc String
     | SelectWc String
     | EnterName String
-
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         AddActor a ->
-            { model | actors = a :: model.actors }
+            { model | actors = a :: model.actors
+                    , currentPane = "ShowCouncils" }
 
         SelectCc v ->
             { model | tempCc = v }
@@ -101,6 +102,11 @@ update msg model =
         ShowCouncilsPane ->
             { model | currentPane = "ShowCouncils" }
 
+        ShowDebugPane ->
+            { model | currentPane = "ShowDebugPane" }
+
+        ShowIterationPane ->
+            { model | currentPane = "Iterate" }
 
 
 -- VIEW
@@ -139,6 +145,10 @@ viewCouncils model =
             ]
 
 
+viewIterate : Model -> Html Msg
+viewIterate model =
+   div [] [ text "Fill me" ]
+
 viewAddActorForm : Model -> Html Msg
 viewAddActorForm model =
     div []
@@ -165,7 +175,7 @@ viewAddActorForm model =
                         model.tempName
                         model.tempCc
                         model.tempWc
-                        0.0
+                        10
                 )
             ]
             [ text "Add Actor" ]
@@ -181,13 +191,15 @@ view model =
                     [ button
                         [ onClick ShowAddActorPane ]
                         [ text "Add Actor" ]
-
-                    --                    , button
-                    --                        [ onClick ShowEditActorPane ]
-                    --                        [ text "Edit Actor pane" ]
                     , button
                         [ onClick ShowCouncilsPane ]
                         [ text "Show Councils" ]
+                    , button
+                        [ onClick ShowIterationPane ]
+                        [ text "Iterate" ]
+                    , button
+                        [ onClick ShowDebugPane ]
+                        [ text "Debug" ]
                     ]
                 ]
             , td []
@@ -198,6 +210,9 @@ view model =
 
                     "ShowCouncils" ->
                         viewCouncils model
+
+                    "Iterate" ->
+                        viewIterate model
 
                     _ ->
                         p [] [ text (toString model) ]
