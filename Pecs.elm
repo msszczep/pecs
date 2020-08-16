@@ -120,13 +120,13 @@ enterActorUpdate councilType model =
                 , numBeersWanted = model.tempBeers
             }
 
-        replacedWc = { actorToUpdate | hoursToWork = model.tempWorkHours }
-
+        replacedWc =
+            { actorToUpdate | hoursToWork = model.tempWorkHours }
     in
         if councilType == "wc" then
-          replacedWc :: remainingActors
+            replacedWc :: remainingActors
         else
-          replacedCc :: remainingActors
+            replacedCc :: remainingActors
 
 
 update : Msg -> Model -> Model
@@ -187,8 +187,10 @@ update msg model =
             }
 
         UpdateActor councilType ->
-            { model | actors = enterActorUpdate councilType model
-                    , currentPane = "ShowCouncils" }
+            { model
+                | actors = enterActorUpdate councilType model
+                , currentPane = "ShowCouncils"
+            }
 
 
 
@@ -200,18 +202,22 @@ update msg model =
 viewCouncil : String -> ( Int, String ) -> Html Msg
 viewCouncil councilType ( id, name ) =
     let
-      onClickToUse = if councilType == "wc" then UpdateWCForm else UpdateCCForm
+        onClickToUse =
+            if councilType == "wc" then
+                UpdateWCForm
+            else
+                UpdateCCForm
     in
-      td
-          [ style "border" "1px solid red"
-          , style "padding" "10px"
-          , style "background-color" "#f78181"
-          ]
-          [ p [] [ text name ]
-          , button
-              [ onClick (onClickToUse id) ]
-              [ text "Submit Data" ]
-          ]
+        td
+            [ style "border" "1px solid red"
+            , style "padding" "10px"
+            , style "background-color" "#f78181"
+            ]
+            [ p [] [ text name ]
+            , button
+                [ onClick (onClickToUse id) ]
+                [ text "Submit Data" ]
+            ]
 
 
 viewCCQuestions : Model -> Html Msg
@@ -245,6 +251,7 @@ viewCCQuestions model =
             [ text "Update Actor" ]
         ]
 
+
 viewWCQuestions : Model -> Html Msg
 viewWCQuestions model =
     div []
@@ -267,6 +274,8 @@ viewWCQuestions model =
             [ onClick (UpdateActor "wc") ]
             [ text "Update Actor" ]
         ]
+
+
 
 -- TODO : Add List.sortBy to end
 
