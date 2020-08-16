@@ -7,6 +7,7 @@ import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
 import Random
 
+
 -- MAIN
 
 
@@ -66,6 +67,7 @@ newActor i name cc wc mlt hilo =
     Actor i name cc wc "0" "0" hilo 0.0 mlt
 
 
+
 -- UPDATE
 
 
@@ -85,10 +87,12 @@ type Msg
     | UpdateActorForm Int
     | UpdateActor
 
+
 getOneActor : List Actor -> Actor
 getOneActor actors =
     let
-        result = List.head actors
+        result =
+            List.head actors
     in
         case result of
             Just x ->
@@ -97,23 +101,33 @@ getOneActor actors =
             Nothing ->
                 newActor 0 "" "" "" 10 ""
 
+
 enterActorUpdate : Model -> List Actor
 enterActorUpdate model =
-   let
-       remainingActors = List.filter (\e -> e.id /= model.tempQuestionFormId) model.actors
-       actorToUpdate = List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
-       replacedActor = { actorToUpdate | numPizzasWanted = model.tempPizzas
-                                       , numBeersWanted = model.tempBeers }
-   in
-       replacedActor :: remainingActors
+    let
+        remainingActors =
+            List.filter (\e -> e.id /= model.tempQuestionFormId) model.actors
+
+        actorToUpdate =
+            List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
+
+        replacedActor =
+            { actorToUpdate
+                | numPizzasWanted = model.tempPizzas
+                , numBeersWanted = model.tempBeers
+            }
+    in
+        replacedActor :: remainingActors
+
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-
         AddActor a ->
-            { model | actors = a :: model.actors
-                    , currentPane = "ShowCouncils" }
+            { model
+                | actors = a :: model.actors
+                , currentPane = "ShowCouncils"
+            }
 
         SelectCc v ->
             { model | tempCc = v }
@@ -149,11 +163,14 @@ update msg model =
             { model | currentPane = "Iterate" }
 
         UpdateActorForm i ->
-            { model | tempQuestionFormId = i
-                    , currentPane = "ShowCCQuestionForm" }
+            { model
+                | tempQuestionFormId = i
+                , currentPane = "ShowCCQuestionForm"
+            }
 
         UpdateActor ->
             { model | actors = enterActorUpdate model }
+
 
 
 -- VIEW
@@ -161,18 +178,20 @@ update msg model =
 -- TODO: Change viewCouncil to adjust color based on completed status
 -- TODO Make button to Submit WC data
 
-viewCouncil : (Int, String) -> Html Msg
-viewCouncil (id, name) =
-  td
-   [ style "border" "1px solid red"
-   , style "padding" "10px"
-   , style "background-color" "#f78181"
-   ]
-  [ p [] [text name]
-  , button
-   [ onClick (UpdateActorForm id) ]
-   [ text "Submit Data" ]
-  ]
+
+viewCouncil : ( Int, String ) -> Html Msg
+viewCouncil ( id, name ) =
+    td
+        [ style "border" "1px solid red"
+        , style "padding" "10px"
+        , style "background-color" "#f78181"
+        ]
+        [ p [] [ text name ]
+        , button
+            [ onClick (UpdateActorForm id) ]
+            [ text "Submit Data" ]
+        ]
+
 
 viewCCQuestions : Model -> Html Msg
 viewCCQuestions model =
@@ -205,52 +224,58 @@ viewCCQuestions model =
             [ text "Update Actor" ]
         ]
 
+
+
 -- TODO : Add List.sortBy to end
+
+
 viewCouncils : Model -> Html Msg
 viewCouncils model =
     let
         pizzas =
-            List.filter (\c -> c.wc == "pizza") model.actors |> List.map (\x -> (x.id, x.name))
+            List.filter (\c -> c.wc == "pizza") model.actors |> List.map (\x -> ( x.id, x.name ))
 
         beers =
-            List.filter (\c -> c.wc == "beer") model.actors |> List.map (\x -> (x.id, x.name))
+            List.filter (\c -> c.wc == "beer") model.actors |> List.map (\x -> ( x.id, x.name ))
 
         ones =
-            List.filter (\c -> c.cc == "1") model.actors |> List.map (\x -> (x.id, x.name))
+            List.filter (\c -> c.cc == "1") model.actors |> List.map (\x -> ( x.id, x.name ))
 
         twos =
-            List.filter (\c -> c.cc == "2") model.actors |> List.map (\x -> (x.id, x.name))
+            List.filter (\c -> c.cc == "2") model.actors |> List.map (\x -> ( x.id, x.name ))
 
         threes =
-            List.filter (\c -> c.cc == "3") model.actors |> List.map (\x -> (x.id, x.name))
+            List.filter (\c -> c.cc == "3") model.actors |> List.map (\x -> ( x.id, x.name ))
     in
         div []
             [ p [] [ text "Workers Council - Pizza:" ]
-            , table [] [
-              tr [] ( List.map viewCouncil pizzas )
-            ]
+            , table []
+                [ tr [] (List.map viewCouncil pizzas)
+                ]
             , p [] [ text "Workers Council - Beer:" ]
-            , table [] [
-              tr [] ( List.map viewCouncil beers )
-            ]
+            , table []
+                [ tr [] (List.map viewCouncil beers)
+                ]
             , p [] [ text "==========================================" ]
             , p [] [ text "Consumers Council - One:" ]
-            , table [] [
-              tr [] ( List.map viewCouncil ones )
-            ]
+            , table []
+                [ tr [] (List.map viewCouncil ones)
+                ]
             , p [] [ text "Consumers Council - Two:" ]
-            , table [] [
-              tr [] ( List.map viewCouncil twos )
-            ]
+            , table []
+                [ tr [] (List.map viewCouncil twos)
+                ]
             , p [] [ text "Consumers Council - Three:" ]
-            , table [] [
-              tr [] ( List.map viewCouncil threes )
+            , table []
+                [ tr [] (List.map viewCouncil threes)
+                ]
             ]
-            ]
+
 
 viewIterate : Model -> Html Msg
 viewIterate model =
-   div [] [ text "Fill me" ]
+    div [] [ text "Fill me" ]
+
 
 viewAddActorForm : Model -> Html Msg
 viewAddActorForm model =
