@@ -27,7 +27,7 @@ type alias Actor =
     , numBeersWanted : String
     , numPizzasWanted : String
     , hiLo : String
-    , hoursToWork : Float
+    , hoursToWork : String
     , maxLeisureTime : Int
     }
 
@@ -48,6 +48,7 @@ type alias Model =
     , tempHiLo : String
     , tempPizzas : String
     , tempBeers : String
+    , tempWorkHours : String
     , tempQuestionFormId : Int
     }
 
@@ -59,12 +60,12 @@ newPriceVector =
 
 init : Model
 init =
-    Model [] newPriceVector "" "" "" "" "" "" "" 0
+    Model [] newPriceVector "" "" "" "" "" "" "" "" 0
 
 
 newActor : Int -> String -> String -> String -> Int -> String -> Actor
 newActor i name cc wc mlt hilo =
-    Actor i name cc wc "0" "0" hilo 0.0 mlt
+    Actor i name cc wc "0" "0" hilo "0" mlt
 
 
 
@@ -84,8 +85,10 @@ type Msg
     | EnterHiLo String
     | SelectPizzas String
     | SelectBeers String
-    | UpdateActorForm Int
-    | UpdateActor
+    | UpdateCCForm Int
+    | UpdateWCForm Int
+    | UpdateActor String
+    | SelectWorkHours String
 
 
 getOneActor : List Actor -> Actor
@@ -102,8 +105,8 @@ getOneActor actors =
                 newActor 0 "" "" "" 10 ""
 
 
-enterActorUpdate : Model -> List Actor
-enterActorUpdate model =
+enterActorUpdate : String -> Model -> List Actor
+enterActorUpdate councilType model =
     let
         remainingActors =
             List.filter (\e -> e.id /= model.tempQuestionFormId) model.actors
@@ -111,13 +114,19 @@ enterActorUpdate model =
         actorToUpdate =
             List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
 
-        replacedActor =
+        replacedCc =
             { actorToUpdate
                 | numPizzasWanted = model.tempPizzas
                 , numBeersWanted = model.tempBeers
             }
+
+        replacedWc = { actorToUpdate | hoursToWork = model.tempWorkHours }
+
     in
-        replacedActor :: remainingActors
+        if councilType == "wc" then
+          replacedWc :: remainingActors
+        else
+          replacedCc :: remainingActors
 
 
 update : Msg -> Model -> Model
@@ -137,6 +146,9 @@ update msg model =
 
         SelectPizzas v ->
             { model | tempPizzas = v }
+
+        SelectWorkHours v ->
+            { model | tempWorkHours = v }
 
         SelectBeers v ->
             { model | tempBeers = v }
@@ -162,41 +174,50 @@ update msg model =
         ShowIterationPane ->
             { model | currentPane = "Iterate" }
 
-        UpdateActorForm i ->
+        UpdateCCForm i ->
             { model
                 | tempQuestionFormId = i
                 , currentPane = "ShowCCQuestionForm"
             }
 
-        UpdateActor ->
-            { model | actors = enterActorUpdate model }
+        UpdateWCForm i ->
+            { model
+                | tempQuestionFormId = i
+                , currentPane = "ShowWCQuestionForm"
+            }
+
+        UpdateActor councilType ->
+            { model | actors = enterActorUpdate councilType model
+                    , currentPane = "ShowCouncils" }
 
 
 
 -- VIEW
 -- #cfc : light green
 -- TODO: Change viewCouncil to adjust color based on completed status
--- TODO Make button to Submit WC data
 
 
-viewCouncil : ( Int, String ) -> Html Msg
-viewCouncil ( id, name ) =
-    td
-        [ style "border" "1px solid red"
-        , style "padding" "10px"
-        , style "background-color" "#f78181"
-        ]
-        [ p [] [ text name ]
-        , button
-            [ onClick (UpdateActorForm id) ]
-            [ text "Submit Data" ]
-        ]
+viewCouncil : String -> ( Int, String ) -> Html Msg
+viewCouncil councilType ( id, name ) =
+    let
+      onClickToUse = if councilType == "wc" then UpdateWCForm else UpdateCCForm
+    in
+      td
+          [ style "border" "1px solid red"
+          , style "padding" "10px"
+          , style "background-color" "#f78181"
+          ]
+          [ p [] [ text name ]
+          , button
+              [ onClick (onClickToUse id) ]
+              [ text "Submit Data" ]
+          ]
 
 
 viewCCQuestions : Model -> Html Msg
 viewCCQuestions model =
     div []
-        [ p [] [ text "How many pizzas do you want" ]
+        [ p [] [ text "How many pizzas do you want?" ]
         , select [ onInput SelectPizzas ]
             [ option [ value "0" ] [ text "Choose a number:" ]
             , option [ value "1" ] [ text "1" ]
@@ -207,7 +228,7 @@ viewCCQuestions model =
             , option [ value "6" ] [ text "6" ]
             , option [ value "7" ] [ text "7" ]
             ]
-        , p [] [ text "How many beers do you want" ]
+        , p [] [ text "How many beers do you want?" ]
         , select [ onInput SelectBeers ]
             [ option [ value "0" ] [ text "Choose a number:" ]
             , option [ value "1" ] [ text "1" ]
@@ -220,11 +241,32 @@ viewCCQuestions model =
             ]
         , p [] []
         , button
-            [ onClick UpdateActor ]
+            [ onClick (UpdateActor "cc") ]
             [ text "Update Actor" ]
         ]
 
-
+viewWCQuestions : Model -> Html Msg
+viewWCQuestions model =
+    div []
+        [ p [] [ text "How many hours do you want to work?" ]
+        , select [ onInput SelectWorkHours ]
+            [ option [ value "0" ] [ text "Choose a number:" ]
+            , option [ value "1" ] [ text "1" ]
+            , option [ value "2" ] [ text "2" ]
+            , option [ value "3" ] [ text "3" ]
+            , option [ value "4" ] [ text "4" ]
+            , option [ value "5" ] [ text "5" ]
+            , option [ value "6" ] [ text "6" ]
+            , option [ value "7" ] [ text "7" ]
+            , option [ value "8" ] [ text "8" ]
+            , option [ value "9" ] [ text "9" ]
+            , option [ value "10" ] [ text "10" ]
+            ]
+        , p [] []
+        , button
+            [ onClick (UpdateActor "wc") ]
+            [ text "Update Actor" ]
+        ]
 
 -- TODO : Add List.sortBy to end
 
@@ -250,24 +292,24 @@ viewCouncils model =
         div []
             [ p [] [ text "Workers Council - Pizza:" ]
             , table []
-                [ tr [] (List.map viewCouncil pizzas)
+                [ tr [] (List.map (viewCouncil "wc") pizzas)
                 ]
             , p [] [ text "Workers Council - Beer:" ]
             , table []
-                [ tr [] (List.map viewCouncil beers)
+                [ tr [] (List.map (viewCouncil "wc") beers)
                 ]
             , p [] [ text "==========================================" ]
             , p [] [ text "Consumers Council - One:" ]
             , table []
-                [ tr [] (List.map viewCouncil ones)
+                [ tr [] (List.map (viewCouncil "cc") ones)
                 ]
             , p [] [ text "Consumers Council - Two:" ]
             , table []
-                [ tr [] (List.map viewCouncil twos)
+                [ tr [] (List.map (viewCouncil "cc") twos)
                 ]
             , p [] [ text "Consumers Council - Three:" ]
             , table []
-                [ tr [] (List.map viewCouncil threes)
+                [ tr [] (List.map (viewCouncil "cc") threes)
                 ]
             ]
 
@@ -348,6 +390,9 @@ view model =
 
                     "ShowCCQuestionForm" ->
                         viewCCQuestions model
+
+                    "ShowWCQuestionForm" ->
+                        viewWCQuestions model
 
                     _ ->
                         p [] [ text (toString model) ]
