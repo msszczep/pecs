@@ -192,6 +192,7 @@ update msg model =
 
 -- VIEW
 
+
 viewCouncil : String -> Actor -> Html Msg
 viewCouncil councilType actor =
     let
@@ -200,23 +201,35 @@ viewCouncil councilType actor =
                 UpdateWCForm
             else
                 UpdateCCForm
-        color = if (councilType == "wc" && actor.hoursToWork /= "0") ||
-                   (councilType == "cc" && actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0") then
-                  "1px solid green"
-                else
-                   "1px solid red"
-        colorCode = if (councilType == "wc" && actor.hoursToWork /= "0") ||
-                   (councilType == "cc" && actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0") then
-                  "#cfc"
-                else
-                   "#f78181"
-        buttonToUse = if (councilType == "wc" && actor.hoursToWork == "0") ||
-                   (councilType == "cc" && actor.numBeersWanted == "0" && actor.numPizzasWanted == "0") then
-              button
-                [ onClick (onClickToUse actor.id) ]
-                [ text "Submit Data" ]
-             else
-                 div [] []
+
+        color =
+            if
+                (councilType == "wc" && actor.hoursToWork /= "0")
+                    || (councilType == "cc" && actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0")
+            then
+                "1px solid green"
+            else
+                "1px solid red"
+
+        colorCode =
+            if
+                (councilType == "wc" && actor.hoursToWork /= "0")
+                    || (councilType == "cc" && actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0")
+            then
+                "#cfc"
+            else
+                "#f78181"
+
+        buttonToUse =
+            if
+                (councilType == "wc" && actor.hoursToWork == "0")
+                    || (councilType == "cc" && actor.numBeersWanted == "0" && actor.numPizzasWanted == "0")
+            then
+                button
+                    [ onClick (onClickToUse actor.id) ]
+                    [ text "Submit Data" ]
+            else
+                div [] []
     in
         td
             [ style "border" color
@@ -325,7 +338,6 @@ viewCouncils model =
                 [ tr [] (List.map (viewCouncil "cc") threes)
                 ]
             ]
-
 
 
 viewAddActorForm : Model -> Html Msg
