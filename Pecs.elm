@@ -78,7 +78,6 @@ type Msg
     | ShowEditActorPane
     | ShowCouncilsPane
     | ShowDebugPane
-    | ShowIterationPane
     | SelectCc String
     | SelectWc String
     | EnterName String
@@ -171,9 +170,6 @@ update msg model =
         ShowDebugPane ->
             { model | currentPane = "ShowDebugPane" }
 
-        ShowIterationPane ->
-            { model | currentPane = "Iterate" }
-
         UpdateCCForm i ->
             { model
                 | tempQuestionFormId = i
@@ -195,28 +191,40 @@ update msg model =
 
 
 -- VIEW
--- #cfc : light green
--- TODO: Change viewCouncil to adjust color based on completed status
 
-
-viewCouncil : String -> ( Int, String ) -> Html Msg
-viewCouncil councilType ( id, name ) =
+viewCouncil : String -> Actor -> Html Msg
+viewCouncil councilType actor =
     let
         onClickToUse =
             if councilType == "wc" then
                 UpdateWCForm
             else
                 UpdateCCForm
+        color = if (councilType == "wc" && actor.hoursToWork /= "0") ||
+                   (councilType == "cc" && actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0") then
+                  "1px solid green"
+                else
+                   "1px solid red"
+        colorCode = if (councilType == "wc" && actor.hoursToWork /= "0") ||
+                   (councilType == "cc" && actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0") then
+                  "#cfc"
+                else
+                   "#f78181"
+        buttonToUse = if (councilType == "wc" && actor.hoursToWork == "0") ||
+                   (councilType == "cc" && actor.numBeersWanted == "0" && actor.numPizzasWanted == "0") then
+              button
+                [ onClick (onClickToUse actor.id) ]
+                [ text "Submit Data" ]
+             else
+                 div [] []
     in
         td
-            [ style "border" "1px solid red"
+            [ style "border" color
             , style "padding" "10px"
-            , style "background-color" "#f78181"
+            , style "background-color" colorCode
             ]
-            [ p [] [ text name ]
-            , button
-                [ onClick (onClickToUse id) ]
-                [ text "Submit Data" ]
+            [ p [] [ text actor.name ]
+            , buttonToUse
             ]
 
 
@@ -276,27 +284,23 @@ viewWCQuestions model =
         ]
 
 
-
--- TODO : Add List.sortBy to end
-
-
 viewCouncils : Model -> Html Msg
 viewCouncils model =
     let
         pizzas =
-            List.filter (\c -> c.wc == "pizza") model.actors |> List.map (\x -> ( x.id, x.name ))
+            List.filter (\c -> c.wc == "pizza") model.actors |> List.sortBy .name
 
         beers =
-            List.filter (\c -> c.wc == "beer") model.actors |> List.map (\x -> ( x.id, x.name ))
+            List.filter (\c -> c.wc == "beer") model.actors |> List.sortBy .name
 
         ones =
-            List.filter (\c -> c.cc == "1") model.actors |> List.map (\x -> ( x.id, x.name ))
+            List.filter (\c -> c.cc == "1") model.actors |> List.sortBy .name
 
         twos =
-            List.filter (\c -> c.cc == "2") model.actors |> List.map (\x -> ( x.id, x.name ))
+            List.filter (\c -> c.cc == "2") model.actors |> List.sortBy .name
 
         threes =
-            List.filter (\c -> c.cc == "3") model.actors |> List.map (\x -> ( x.id, x.name ))
+            List.filter (\c -> c.cc == "3") model.actors |> List.sortBy .name
     in
         div []
             [ p [] [ text "Workers Council - Pizza:" ]
@@ -322,10 +326,6 @@ viewCouncils model =
                 ]
             ]
 
-
-viewIterate : Model -> Html Msg
-viewIterate model =
-    div [] [ text "Fill me" ]
 
 
 viewAddActorForm : Model -> Html Msg
@@ -378,9 +378,6 @@ view model =
                         [ onClick ShowCouncilsPane ]
                         [ text "Show Councils" ]
                     , button
-                        [ onClick ShowIterationPane ]
-                        [ text "Iterate" ]
-                    , button
                         [ onClick ShowDebugPane ]
                         [ text "Debug" ]
                     ]
@@ -393,9 +390,6 @@ view model =
 
                     "ShowCouncils" ->
                         viewCouncils model
-
-                    "Iterate" ->
-                        viewIterate model
 
                     "ShowCCQuestionForm" ->
                         viewCCQuestions model
