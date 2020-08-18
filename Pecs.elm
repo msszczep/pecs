@@ -230,20 +230,26 @@ viewCouncil councilType actor =
                     [ text "Enter Data" ]
             else
                 div [] []
+
         wcVerbiage =
             if actor.hoursToWork /= "0" then
-              "(" ++ actor.hoursToWork ++ " hrs.)"
+                "(" ++ actor.hoursToWork ++ " hrs.)"
             else
-              ""
+                ""
+
         ccVerbiage =
-             if actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0" then
-              "(" ++ actor.numPizzasWanted ++ " pizzas, " ++ actor.numBeersWanted ++ " beers)"
-             else
-              ""
+            if actor.numBeersWanted /= "0" && actor.numPizzasWanted /= "0" then
+                "(" ++ actor.numPizzasWanted ++ " pizzas, " ++ actor.numBeersWanted ++ " beers)"
+            else
+                ""
+
         verbiage =
-             case councilType of
-               "wc" -> wcVerbiage
-               _    -> ccVerbiage
+            case councilType of
+                "wc" ->
+                    wcVerbiage
+
+                _ ->
+                    ccVerbiage
     in
         td
             [ style "border" color
@@ -254,7 +260,11 @@ viewCouncil councilType actor =
             , buttonToUse
             ]
 
+
+
 -- TODO Add name in output:
+
+
 viewCCQuestions : Model -> Html Msg
 viewCCQuestions model =
     div []
@@ -286,7 +296,11 @@ viewCCQuestions model =
             [ text "Update Actor" ]
         ]
 
+
+
 -- # TODO: Add name in output:
+
+
 viewWCQuestions : Model -> Html Msg
 viewWCQuestions model =
     div []
