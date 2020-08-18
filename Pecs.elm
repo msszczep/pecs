@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, text, p, table, tr, td, h2, br, input, select, option)
+import Html exposing (Html, button, div, text, p, table, tr, td, h2, br, b, input, select, option)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
@@ -78,6 +78,7 @@ type Msg
     | ShowEditActorPane
     | ShowCouncilsPane
     | ShowDebugPane
+    | ShowInstructionsPane
     | SelectCc String
     | SelectWc String
     | EnterName String
@@ -158,6 +159,9 @@ update msg model =
         EnterHiLo s ->
             { model | tempHiLo = s }
 
+        ShowInstructionsPane ->
+            { model | currentPane = "" }
+
         ShowAddActorPane ->
             { model | currentPane = "AddActor" }
 
@@ -168,7 +172,7 @@ update msg model =
             { model | currentPane = "ShowCouncils" }
 
         ShowDebugPane ->
-            { model | currentPane = "ShowDebugPane" }
+            { model | currentPane = "ShowDebugPanel" }
 
         UpdateCCForm i ->
             { model
@@ -324,6 +328,44 @@ viewWCQuestions model =
             [ text "Update Actor" ]
         ]
 
+showStats : Model -> Html Msg
+showStats model =
+    let
+      pizzaHours = model.actors
+                |> List.filter (\c -> c.wc == "pizza")
+                |> List.map .hoursToWork
+                |> List.map String.toInt
+                |> List.map (Maybe.withDefault 0)
+                |> List.foldl (+) 0
+                |> String.fromInt
+      beerHours = model.actors
+                |> List.filter (\c -> c.cc == "beer")
+                |> List.map .hoursToWork
+                |> List.map String.toInt
+                |> List.map (Maybe.withDefault 0)
+                |> List.foldl (+) 0
+                |> String.fromInt
+      pizzaSupply = pizzaHours
+                    |> String.toInt
+                    |> Maybe.withDefault 0 |> (*) 2 |> String.fromInt
+      beerSupply = beerHours
+      pizzaDemand = model.actors
+                |> List.map .numPizzasWanted
+                |> List.map String.toInt
+                |> List.map (Maybe.withDefault 0)
+                |> List.foldl (+) 0
+                |> String.fromInt
+    in
+      div []
+      [ b [] [ text "Work council stats" ]
+      , p [] [ text ("Pizza council workhours: " ++ pizzaHours)]
+      , p [] [ text ("Beer council workhours: " ++ beerHours)]
+      , b [] [ text "Supply stats"]
+      , p [] [ text ("Pizza supply: " ++ pizzaSupply)]
+      , p [] [ text ("Beer supply: " ++ beerSupply)]
+      ]
+
+
 
 viewCouncils : Model -> Html Msg
 viewCouncils model =
@@ -343,7 +385,16 @@ viewCouncils model =
         threes =
             List.filter (\c -> c.cc == "3") model.actors |> List.sortBy .name
     in
-        div []
+        table []
+        [ tr []
+          [
+          td [ style "padding" "30px"
+             , style "vertical-align" "text-top"
+             ]
+          [ showStats model ]
+        ,
+        td [ style "padding" "30px"
+           , style "vertical-align" "text-top" ]
             [ p [] [ text "Workers Council - Pizza:" ]
             , table []
                 [ tr [] (List.map (viewCouncil "wc") pizzas)
@@ -366,6 +417,8 @@ viewCouncils model =
                 [ tr [] (List.map (viewCouncil "cc") threes)
                 ]
             ]
+         ]
+        ]
 
 
 viewAddActorForm : Model -> Html Msg
@@ -412,6 +465,9 @@ view model =
             [ tr []
                 [ td []
                     [ button
+                        [ onClick ShowInstructionsPane ]
+                        [ text "Instructions" ]
+                    , button
                         [ onClick ShowAddActorPane ]
                         [ text "Add Actor" ]
                     , button
@@ -437,8 +493,12 @@ view model =
                     "ShowWCQuestionForm" ->
                         viewWCQuestions model
 
-                    _ ->
+                    "ShowDebugPanel" ->
                         p [] [ text (toString model) ]
+
+                    _ ->
+                        p [] [ text "instructions go here" ]
+
                 ]
             ]
         ]
