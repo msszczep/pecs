@@ -329,77 +329,107 @@ viewWCQuestions model =
             [ text "Update Actor" ]
         ]
 
+
+
 -- TODO : Fix hoursToWork and hiLoThreshold to be numbers
+
+
 computeCcBudget : String -> String -> List Actor -> String
 computeCcBudget id hiLoThreshold actors =
-   let
-     actorsInCouncil = actors
-                      |> List.filter (\c -> c.cc == id)
-                      |> List.filter (\c -> c.hoursToWork /= "0")
-     hiLoCouncils = List.partition (\x -> x.hoursToWork < hiLoThreshold) actorsInCouncil
-   in
-     (List.length (first hiLoCouncils) * 50) + (List.length (second hiLoCouncils) * 100) |> String.fromInt
+    let
+        actorsInCouncil =
+            actors
+                |> List.filter (\c -> c.cc == id)
+                |> List.filter (\c -> c.hoursToWork /= "0")
+
+        hiLoCouncils =
+            List.partition (\x -> x.hoursToWork < hiLoThreshold) actorsInCouncil
+    in
+        (List.length (first hiLoCouncils) * 50) + (List.length (second hiLoCouncils) * 100) |> String.fromInt
+
 
 showStats : Model -> Html Msg
 showStats model =
     let
-      pizzaHours = model.actors
+        pizzaHours =
+            model.actors
                 |> List.filter (\c -> c.wc == "pizza")
                 |> List.map .hoursToWork
                 |> List.map String.toInt
                 |> List.map (Maybe.withDefault 0)
                 |> List.foldl (+) 0
                 |> String.fromInt
-      beerHours = model.actors
+
+        beerHours =
+            model.actors
                 |> List.filter (\c -> c.wc == "beer")
                 |> List.map .hoursToWork
                 |> List.map String.toInt
                 |> List.map (Maybe.withDefault 0)
                 |> List.foldl (+) 0
                 |> String.fromInt
-      pizzaSupply = pizzaHours
-                    |> String.toInt
-                    |> Maybe.withDefault 0 |> (*) 2 |> String.fromInt
-      beerSupply = beerHours
-      pizzaDemand = model.actors
+
+        pizzaSupply =
+            pizzaHours
+                |> String.toInt
+                |> Maybe.withDefault 0
+                |> (*) 2
+                |> String.fromInt
+
+        beerSupply =
+            beerHours
+
+        pizzaDemand =
+            model.actors
                 |> List.map .numPizzasWanted
                 |> List.map String.toInt
                 |> List.map (Maybe.withDefault 0)
                 |> List.foldl (+) 0
                 |> String.fromInt
-      beerDemand = model.actors
+
+        beerDemand =
+            model.actors
                 |> List.map .numBeersWanted
                 |> List.map String.toInt
                 |> List.map (Maybe.withDefault 0)
                 |> List.foldl (+) 0
                 |> String.fromInt
-      hiLoSum = model.actors
+
+        hiLoSum =
+            model.actors
                 |> List.map .hiLo
                 |> List.map String.toInt
                 |> List.map (Maybe.withDefault 0)
                 |> List.foldl (+) 0
-      hiLoAvg = (toFloat hiLoSum) / (toFloat (List.length model.actors)) |> String.fromFloat
-      cc1budget = computeCcBudget "1" hiLoAvg model.actors
-      cc2budget = computeCcBudget "2" hiLoAvg model.actors
-      cc3budget = computeCcBudget "3" hiLoAvg model.actors
-    in
-      div []
-      [ b [] [ text "Work council stats" ]
-      , p [] [ text ("Pizza council workhours: " ++ pizzaHours)]
-      , p [] [ text ("Beer council workhours: " ++ beerHours)]
-      , b [] [ text "Supply stats"]
-      , p [] [ text ("Pizza supply: " ++ pizzaSupply)]
-      , p [] [ text ("Beer supply: " ++ beerSupply)]
-      , b [] [ text "Demand stats"]
-      , p [] [ text ("Pizza demand: " ++ pizzaDemand)]
-      , p [] [ text ("Beer demand: " ++ beerDemand)]
-      , b [] [ text "Council budgets:"]
-      , p [] [ text ("CC1: " ++ cc1budget)]
-      , p [] [ text ("CC2: " ++ cc2budget)]
-      , p [] [ text ("CC3: " ++ cc3budget)]
-      , b [] [ text ("HiLo Threshold: " ++ hiLoAvg)]
-      ]
 
+        hiLoAvg =
+            (toFloat hiLoSum) / (toFloat (List.length model.actors)) |> String.fromFloat
+
+        cc1budget =
+            computeCcBudget "1" hiLoAvg model.actors
+
+        cc2budget =
+            computeCcBudget "2" hiLoAvg model.actors
+
+        cc3budget =
+            computeCcBudget "3" hiLoAvg model.actors
+    in
+        div []
+            [ b [] [ text "Work council stats" ]
+            , p [] [ text ("Pizza council workhours: " ++ pizzaHours) ]
+            , p [] [ text ("Beer council workhours: " ++ beerHours) ]
+            , b [] [ text "Supply stats" ]
+            , p [] [ text ("Pizza supply: " ++ pizzaSupply) ]
+            , p [] [ text ("Beer supply: " ++ beerSupply) ]
+            , b [] [ text "Demand stats" ]
+            , p [] [ text ("Pizza demand: " ++ pizzaDemand) ]
+            , p [] [ text ("Beer demand: " ++ beerDemand) ]
+            , b [] [ text "Council budgets:" ]
+            , p [] [ text ("CC1: " ++ cc1budget) ]
+            , p [] [ text ("CC2: " ++ cc2budget) ]
+            , p [] [ text ("CC3: " ++ cc3budget) ]
+            , b [] [ text ("HiLo Threshold: " ++ hiLoAvg) ]
+            ]
 
 
 viewCouncils : Model -> Html Msg
@@ -421,39 +451,40 @@ viewCouncils model =
             List.filter (\c -> c.cc == "3") model.actors |> List.sortBy .name
     in
         table []
-        [ tr []
-          [
-          td [ style "padding" "30px"
-             , style "vertical-align" "text-top"
-             ]
-          [ showStats model ]
-        ,
-        td [ style "padding" "30px"
-           , style "vertical-align" "text-top" ]
-            [ p [] [ text "Workers Council - Pizza:" ]
-            , table []
-                [ tr [] (List.map (viewCouncil "wc") pizzas)
-                ]
-            , p [] [ text "Workers Council - Beer:" ]
-            , table []
-                [ tr [] (List.map (viewCouncil "wc") beers)
-                ]
-            , p [] [ text "==========================================" ]
-            , p [] [ text "Consumers Council - One:" ]
-            , table []
-                [ tr [] (List.map (viewCouncil "cc") ones)
-                ]
-            , p [] [ text "Consumers Council - Two:" ]
-            , table []
-                [ tr [] (List.map (viewCouncil "cc") twos)
-                ]
-            , p [] [ text "Consumers Council - Three:" ]
-            , table []
-                [ tr [] (List.map (viewCouncil "cc") threes)
+            [ tr []
+                [ td
+                    [ style "padding" "30px"
+                    , style "vertical-align" "text-top"
+                    ]
+                    [ showStats model ]
+                , td
+                    [ style "padding" "30px"
+                    , style "vertical-align" "text-top"
+                    ]
+                    [ p [] [ text "Workers Council - Pizza:" ]
+                    , table []
+                        [ tr [] (List.map (viewCouncil "wc") pizzas)
+                        ]
+                    , p [] [ text "Workers Council - Beer:" ]
+                    , table []
+                        [ tr [] (List.map (viewCouncil "wc") beers)
+                        ]
+                    , p [] [ text "==========================================" ]
+                    , p [] [ text "Consumers Council - One:" ]
+                    , table []
+                        [ tr [] (List.map (viewCouncil "cc") ones)
+                        ]
+                    , p [] [ text "Consumers Council - Two:" ]
+                    , table []
+                        [ tr [] (List.map (viewCouncil "cc") twos)
+                        ]
+                    , p [] [ text "Consumers Council - Three:" ]
+                    , table []
+                        [ tr [] (List.map (viewCouncil "cc") threes)
+                        ]
+                    ]
                 ]
             ]
-         ]
-        ]
 
 
 viewAddActorForm : Model -> Html Msg
@@ -533,7 +564,6 @@ view model =
 
                     _ ->
                         p [] [ text "instructions go here" ]
-
                 ]
             ]
         ]
