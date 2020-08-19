@@ -5,6 +5,7 @@ import Html exposing (Html, button, div, text, p, table, tr, td, h2, br, b, inpu
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
+import Tuple exposing (first, second)
 import Random
 
 
@@ -328,6 +329,17 @@ viewWCQuestions model =
             [ text "Update Actor" ]
         ]
 
+-- TODO : Fix hoursToWork and hiLoThreshold to be numbers
+computeCcBudget : String -> String -> List Actor -> String
+computeCcBudget id hiLoThreshold actors =
+   let
+     actorsInCouncil = actors
+                      |> List.filter (\c -> c.cc == id)
+                      |> List.filter (\c -> c.hoursToWork /= "0")
+     hiLoCouncils = List.partition (\x -> x.hoursToWork < hiLoThreshold) actorsInCouncil
+   in
+     (List.length (first hiLoCouncils) * 50) + (List.length (second hiLoCouncils) * 100) |> String.fromInt
+
 showStats : Model -> Html Msg
 showStats model =
     let
@@ -339,7 +351,7 @@ showStats model =
                 |> List.foldl (+) 0
                 |> String.fromInt
       beerHours = model.actors
-                |> List.filter (\c -> c.cc == "beer")
+                |> List.filter (\c -> c.wc == "beer")
                 |> List.map .hoursToWork
                 |> List.map String.toInt
                 |> List.map (Maybe.withDefault 0)
@@ -355,6 +367,21 @@ showStats model =
                 |> List.map (Maybe.withDefault 0)
                 |> List.foldl (+) 0
                 |> String.fromInt
+      beerDemand = model.actors
+                |> List.map .numBeersWanted
+                |> List.map String.toInt
+                |> List.map (Maybe.withDefault 0)
+                |> List.foldl (+) 0
+                |> String.fromInt
+      hiLoSum = model.actors
+                |> List.map .hiLo
+                |> List.map String.toInt
+                |> List.map (Maybe.withDefault 0)
+                |> List.foldl (+) 0
+      hiLoAvg = (toFloat hiLoSum) / (toFloat (List.length model.actors)) |> String.fromFloat
+      cc1budget = computeCcBudget "1" hiLoAvg model.actors
+      cc2budget = computeCcBudget "2" hiLoAvg model.actors
+      cc3budget = computeCcBudget "3" hiLoAvg model.actors
     in
       div []
       [ b [] [ text "Work council stats" ]
@@ -363,6 +390,14 @@ showStats model =
       , b [] [ text "Supply stats"]
       , p [] [ text ("Pizza supply: " ++ pizzaSupply)]
       , p [] [ text ("Beer supply: " ++ beerSupply)]
+      , b [] [ text "Demand stats"]
+      , p [] [ text ("Pizza demand: " ++ pizzaDemand)]
+      , p [] [ text ("Beer demand: " ++ beerDemand)]
+      , b [] [ text "Council budgets:"]
+      , p [] [ text ("CC1: " ++ cc1budget)]
+      , p [] [ text ("CC2: " ++ cc2budget)]
+      , p [] [ text ("CC3: " ++ cc3budget)]
+      , b [] [ text ("HiLo Threshold: " ++ hiLoAvg)]
       ]
 
 
