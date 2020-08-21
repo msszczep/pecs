@@ -348,7 +348,7 @@ computeCcBudget id hiLoThreshold actors =
         (List.length (first hiLoCouncils) * 50) + (List.length (second hiLoCouncils) * 100) |> String.fromInt
 
 
-showStats : Model -> Html Msg
+showStats : Model -> List (Html msg)
 showStats model =
     let
         pizzaHours =
@@ -414,23 +414,34 @@ showStats model =
         cc3budget =
             computeCcBudget "3" hiLoAvg model.actors
     in
-        div []
-            [ b [] [ text "Work council stats" ]
+        [ td
+            [ style "padding" "30px"
+            , style "vertical-align" "text-top"
+            ]
+         [ b [] [ text "Work council stats" ]
             , p [] [ text ("Pizza council workhours: " ++ pizzaHours) ]
             , p [] [ text ("Beer council workhours: " ++ beerHours) ]
+            , b [] [ text "Consumer council budgets:" ]
+            , p [] [ text ("CC1: " ++ cc1budget) ]
+            , p [] [ text ("CC2: " ++ cc2budget) ]
+            , p [] [ text ("CC3: " ++ cc3budget) ]
+            , b [] [ text ("HiLo Threshold: " ++ hiLoAvg) ]
+         ]
+        , td [ style "padding" "30px"
+            , style "vertical-align" "text-top"
+            ]
+            [ b [] [ text "Prices"]
+            , p [] [ text ("Pizza: " ++ String.fromFloat model.prices.pizza) ]
+            , p [] [ text ("Beer: " ++ String.fromFloat model.prices.beer) ]
             , b [] [ text "Supply stats" ]
             , p [] [ text ("Pizza supply: " ++ pizzaSupply) ]
             , p [] [ text ("Beer supply: " ++ beerSupply) ]
             , b [] [ text "Demand stats" ]
             , p [] [ text ("Pizza demand: " ++ pizzaDemand) ]
             , p [] [ text ("Beer demand: " ++ beerDemand) ]
-            , b [] [ text "Council budgets:" ]
-            , p [] [ text ("CC1: " ++ cc1budget) ]
-            , p [] [ text ("CC2: " ++ cc2budget) ]
-            , p [] [ text ("CC3: " ++ cc3budget) ]
-            , b [] [ text ("HiLo Threshold: " ++ hiLoAvg) ]
-            ]
 
+            ]
+        ]
 
 viewCouncils : Model -> Html Msg
 viewCouncils model =
@@ -452,12 +463,8 @@ viewCouncils model =
     in
         table []
             [ tr []
+                (List.append (showStats model)
                 [ td
-                    [ style "padding" "30px"
-                    , style "vertical-align" "text-top"
-                    ]
-                    [ showStats model ]
-                , td
                     [ style "padding" "30px"
                     , style "vertical-align" "text-top"
                     ]
@@ -483,7 +490,7 @@ viewCouncils model =
                         [ tr [] (List.map (viewCouncil "cc") threes)
                         ]
                     ]
-                ]
+                ])
             ]
 
 
