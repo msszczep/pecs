@@ -418,7 +418,7 @@ showStats model =
             [ style "padding" "30px"
             , style "vertical-align" "text-top"
             ]
-         [ b [] [ text "Work council stats" ]
+            [ b [] [ text "Work council stats" ]
             , p [] [ text ("Pizza council workhours: " ++ pizzaHours) ]
             , p [] [ text ("Beer council workhours: " ++ beerHours) ]
             , b [] [ text "Consumer council budgets:" ]
@@ -426,11 +426,12 @@ showStats model =
             , p [] [ text ("CC2: " ++ cc2budget) ]
             , p [] [ text ("CC3: " ++ cc3budget) ]
             , b [] [ text ("HiLo Threshold: " ++ hiLoAvg) ]
-         ]
-        , td [ style "padding" "30px"
+            ]
+        , td
+            [ style "padding" "30px"
             , style "vertical-align" "text-top"
             ]
-            [ b [] [ text "Prices"]
+            [ b [] [ text "Prices" ]
             , p [] [ text ("Pizza: " ++ String.fromFloat model.prices.pizza) ]
             , p [] [ text ("Beer: " ++ String.fromFloat model.prices.beer) ]
             , b [] [ text "Supply stats" ]
@@ -439,9 +440,9 @@ showStats model =
             , b [] [ text "Demand stats" ]
             , p [] [ text ("Pizza demand: " ++ pizzaDemand) ]
             , p [] [ text ("Beer demand: " ++ beerDemand) ]
-
             ]
         ]
+
 
 viewCouncils : Model -> Html Msg
 viewCouncils model =
@@ -464,33 +465,34 @@ viewCouncils model =
         table []
             [ tr []
                 (List.append (showStats model)
-                [ td
-                    [ style "padding" "30px"
-                    , style "vertical-align" "text-top"
+                    [ td
+                        [ style "padding" "30px"
+                        , style "vertical-align" "text-top"
+                        ]
+                        [ p [] [ text "Workers Council - Pizza:" ]
+                        , table []
+                            [ tr [] (List.map (viewCouncil "wc") pizzas)
+                            ]
+                        , p [] [ text "Workers Council - Beer:" ]
+                        , table []
+                            [ tr [] (List.map (viewCouncil "wc") beers)
+                            ]
+                        , p [] [ text "==========================================" ]
+                        , p [] [ text "Consumers Council - One:" ]
+                        , table []
+                            [ tr [] (List.map (viewCouncil "cc") ones)
+                            ]
+                        , p [] [ text "Consumers Council - Two:" ]
+                        , table []
+                            [ tr [] (List.map (viewCouncil "cc") twos)
+                            ]
+                        , p [] [ text "Consumers Council - Three:" ]
+                        , table []
+                            [ tr [] (List.map (viewCouncil "cc") threes)
+                            ]
+                        ]
                     ]
-                    [ p [] [ text "Workers Council - Pizza:" ]
-                    , table []
-                        [ tr [] (List.map (viewCouncil "wc") pizzas)
-                        ]
-                    , p [] [ text "Workers Council - Beer:" ]
-                    , table []
-                        [ tr [] (List.map (viewCouncil "wc") beers)
-                        ]
-                    , p [] [ text "==========================================" ]
-                    , p [] [ text "Consumers Council - One:" ]
-                    , table []
-                        [ tr [] (List.map (viewCouncil "cc") ones)
-                        ]
-                    , p [] [ text "Consumers Council - Two:" ]
-                    , table []
-                        [ tr [] (List.map (viewCouncil "cc") twos)
-                        ]
-                    , p [] [ text "Consumers Council - Three:" ]
-                    , table []
-                        [ tr [] (List.map (viewCouncil "cc") threes)
-                        ]
-                    ]
-                ])
+                )
             ]
 
 
