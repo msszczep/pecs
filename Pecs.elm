@@ -70,7 +70,10 @@ newActor i name cc wc mlt hilo =
 
 
 testActors : List Actor
-testActors = [{ cc = "3", hiLo = "7", hoursToWork = "8", id = 3, maxLeisureTime = 10, name = "Jason", numBeersWanted = "3", numPizzasWanted = "5", wc = "beer" },{ cc = "2", hiLo = "2", hoursToWork = "1", id = 2, maxLeisureTime = 10, name = "Zachary", numBeersWanted = "1", numPizzasWanted = "3", wc = "pizza" },{ cc = "2", hiLo = "8", hoursToWork = "8", id = 4, maxLeisureTime = 10, name = "Chris", numBeersWanted = "3", numPizzasWanted = "3", wc = "beer" },{ cc = "1", hiLo = "4", hoursToWork = "4", id = 1, maxLeisureTime = 10, name = "Mitchell", numBeersWanted = "1", numPizzasWanted = "6", wc = "pizza" }]
+testActors =
+    [ { cc = "3", hiLo = "7", hoursToWork = "8", id = 3, maxLeisureTime = 10, name = "Jason", numBeersWanted = "3", numPizzasWanted = "5", wc = "beer" }, { cc = "2", hiLo = "2", hoursToWork = "1", id = 2, maxLeisureTime = 10, name = "Zachary", numBeersWanted = "1", numPizzasWanted = "3", wc = "pizza" }, { cc = "2", hiLo = "8", hoursToWork = "8", id = 4, maxLeisureTime = 10, name = "Chris", numBeersWanted = "3", numPizzasWanted = "3", wc = "beer" }, { cc = "1", hiLo = "4", hoursToWork = "4", id = 1, maxLeisureTime = 10, name = "Mitchell", numBeersWanted = "1", numPizzasWanted = "6", wc = "pizza" } ]
+
+
 
 -- UPDATE
 
@@ -356,23 +359,38 @@ computeCcBudget id hiLoThreshold actors =
     in
         (List.length (first hiLoCouncils) * 50) + (List.length (second hiLoCouncils) * 100) |> String.fromInt
 
+
 quickIntConvert : String -> Int
 quickIntConvert s =
-  String.toInt s |> Maybe.withDefault 0
+    String.toInt s |> Maybe.withDefault 0
 
 
-priceRangeFunction : String -> String -> (Bool, (String, String))
+priceRangeFunction : String -> String -> ( Bool, ( String, String ) )
 priceRangeFunction val1 val2 =
-  let
-    val1Int = quickIntConvert val1
-    val2Int = quickIntConvert val2
-    maxQty = max val1Int val2Int |> toFloat
-    minQty = min val1Int val2Int |> toFloat
-    maxFinalRange = maxQty * 1.1
-    minFinalRange = maxQty * 0.9
-    isInRange = minQty < maxFinalRange && minQty > minFinalRange
-  in
-    (isInRange, (String.fromFloat minFinalRange, String.fromFloat maxFinalRange))
+    let
+        val1Int =
+            quickIntConvert val1
+
+        val2Int =
+            quickIntConvert val2
+
+        maxQty =
+            max val1Int val2Int |> toFloat
+
+        minQty =
+            min val1Int val2Int |> toFloat
+
+        maxFinalRange =
+            maxQty * 1.1
+
+        minFinalRange =
+            maxQty * 0.9
+
+        isInRange =
+            minQty < maxFinalRange && minQty > minFinalRange
+    in
+        ( isInRange, ( String.fromFloat minFinalRange, String.fromFloat maxFinalRange ) )
+
 
 showStats : Model -> List (Html msg)
 showStats model =
@@ -439,10 +457,24 @@ showStats model =
 
         cc3budget =
             computeCcBudget "3" hiLoAvg model.actors
-        (beerRangeResult, (beerRangeMin, beerRangeMax)) = priceRangeFunction beerDemand beerSupply
-        (pizzaRangeResult, (pizzaRangeMin, pizzaRangeMax)) = priceRangeFunction pizzaDemand pizzaSupply
-        beerRangeResultShow = if beerRangeResult == True then "OK" else "FAIL"
-        pizzaRangeResultShow = if pizzaRangeResult == True then "OK" else "FAIL"
+
+        ( beerRangeResult, ( beerRangeMin, beerRangeMax ) ) =
+            priceRangeFunction beerDemand beerSupply
+
+        ( pizzaRangeResult, ( pizzaRangeMin, pizzaRangeMax ) ) =
+            priceRangeFunction pizzaDemand pizzaSupply
+
+        beerRangeResultShow =
+            if beerRangeResult == True then
+                "OK"
+            else
+                "FAIL"
+
+        pizzaRangeResultShow =
+            if pizzaRangeResult == True then
+                "OK"
+            else
+                "FAIL"
     in
         [ td
             [ style "padding" "30px"
@@ -477,9 +509,9 @@ showStats model =
             ]
             [ b [] [ text "Final iteration status" ]
             , p [] [ text ("Pizza Results: " ++ pizzaRangeMin ++ " | " ++ pizzaRangeMax) ]
-            , p [] [ text ("Pizza " ++ beerRangeResultShow)]
+            , p [] [ text ("Pizza " ++ beerRangeResultShow) ]
             , p [] [ text ("Beer Results: " ++ beerRangeMin ++ " | " ++ beerRangeMax) ]
-            , p [] [ text ("Beer " ++ beerRangeResultShow)]
+            , p [] [ text ("Beer " ++ beerRangeResultShow) ]
             ]
         ]
 
@@ -594,7 +626,7 @@ view model =
                     , button
                         [ onClick ApplyTestActors ]
                         [ text "Test Actors" ]
-                   ]
+                    ]
                 ]
             , td []
                 [ h2 [] [ text "Participatory Economics Classroom Simulator" ]
