@@ -71,7 +71,47 @@ newActor i name cc wc mlt hilo =
 
 testActors : List Actor
 testActors =
-    [ { cc = "3", hiLo = "7", hoursToWork = "8", id = 3, maxLeisureTime = 10, name = "Jason", numBeersWanted = "3", numPizzasWanted = "5", wc = "beer" }, { cc = "2", hiLo = "2", hoursToWork = "1", id = 2, maxLeisureTime = 10, name = "Zachary", numBeersWanted = "1", numPizzasWanted = "3", wc = "pizza" }, { cc = "2", hiLo = "8", hoursToWork = "8", id = 4, maxLeisureTime = 10, name = "Chris", numBeersWanted = "3", numPizzasWanted = "3", wc = "beer" }, { cc = "1", hiLo = "4", hoursToWork = "4", id = 1, maxLeisureTime = 10, name = "Mitchell", numBeersWanted = "1", numPizzasWanted = "6", wc = "pizza" } ]
+    [ { cc = "3"
+      , hiLo = "7"
+      , hoursToWork = "8"
+      , id = 3
+      , maxLeisureTime = 10
+      , name = "Jason"
+      , numBeersWanted = "3"
+      , numPizzasWanted = "5"
+      , wc = "beer"
+      }
+    , { cc = "2"
+      , hiLo = "2"
+      , hoursToWork = "2"
+      , id = 2
+      , maxLeisureTime = 10
+      , name = "Zachary"
+      , numBeersWanted = "1"
+      , numPizzasWanted = "4"
+      , wc = "pizza"
+      }
+    , { cc = "2"
+      , hiLo = "8"
+      , hoursToWork = "8"
+      , id = 4
+      , maxLeisureTime = 10
+      , name = "Chris"
+      , numBeersWanted = "3"
+      , numPizzasWanted = "4"
+      , wc = "beer"
+      }
+    , { cc = "1"
+      , hiLo = "4"
+      , hoursToWork = "8"
+      , id = 1
+      , maxLeisureTime = 10
+      , name = "Mitchell"
+      , numBeersWanted = "1"
+      , numPizzasWanted = "6"
+      , wc = "pizza"
+      }
+    ]
 
 
 
@@ -470,11 +510,23 @@ showStats model =
             else
                 "FAIL"
 
+        beerRangeResultStyle =
+            if beerRangeResult == True then
+                "green"
+            else
+                "red"
+
         pizzaRangeResultShow =
             if pizzaRangeResult == True then
                 "OK"
             else
                 "FAIL"
+
+        pizzaRangeResultStyle =
+            if pizzaRangeResult == True then
+                "green"
+            else
+                "red"
     in
         [ td
             [ style "padding" "30px"
@@ -509,9 +561,11 @@ showStats model =
             ]
             [ b [] [ text "Final iteration status" ]
             , p [] [ text ("Pizza Results: " ++ pizzaRangeMin ++ " | " ++ pizzaRangeMax) ]
-            , p [] [ text ("Pizza " ++ beerRangeResultShow) ]
+            , b [ style "color" pizzaRangeResultStyle ]
+                [ text pizzaRangeResultShow ]
             , p [] [ text ("Beer Results: " ++ beerRangeMin ++ " | " ++ beerRangeMax) ]
-            , p [] [ text ("Beer " ++ beerRangeResultShow) ]
+            , b [ style "color" beerRangeResultStyle ]
+                [ text beerRangeResultShow ]
             ]
         ]
 
