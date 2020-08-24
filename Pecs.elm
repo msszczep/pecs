@@ -404,6 +404,23 @@ quickIntConvert : String -> Int
 quickIntConvert s =
     String.toInt s |> Maybe.withDefault 0
 
+quickFloatConvert : String -> Float
+quickFloatConvert s =
+    String.toInt s |> Maybe.withDefault 0 |> toFloat
+
+
+demandsByCouncilAndGood : String -> String -> List Actor -> String
+demandsByCouncilAndGood id good actors =
+  let
+    goodToUse = if good == "beer" then .numBeersWanted else .numPizzasWanted
+  in
+    actors
+    |> List.filter (\c -> c.cc == id)
+    |> List.map goodToUse
+    |> List.map String.toInt
+    |> List.map (Maybe.withDefault 0)
+    |> List.foldl (+) 0
+    |> String.fromInt
 
 priceRangeFunction : String -> String -> ( Bool, ( String, String ) )
 priceRangeFunction val1 val2 =
@@ -504,29 +521,48 @@ showStats model =
         ( pizzaRangeResult, ( pizzaRangeMin, pizzaRangeMax ) ) =
             priceRangeFunction pizzaDemand pizzaSupply
 
-        beerRangeResultShow =
+        ( beerRangeResultShow, beerRangeResultStyle) =
             if beerRangeResult == True then
-                "OK"
+                ("OK", "green")
             else
-                "FAIL"
+                ("FAIL", "red")
 
-        beerRangeResultStyle =
-            if beerRangeResult == True then
-                "green"
-            else
-                "red"
-
-        pizzaRangeResultShow =
+        ( pizzaRangeResultShow, pizzaRangeResultStyle) =
             if pizzaRangeResult == True then
-                "OK"
+                ("OK", "green")
             else
-                "FAIL"
+                ("FAIL", "red")
 
-        pizzaRangeResultStyle =
-            if pizzaRangeResult == True then
-                "green"
-            else
-                "red"
+
+        cc1BudgetSurplus = (quickFloatConvert cc1budget)
+                           - (model.prices.beer * (quickFloatConvert (demandsByCouncilAndGood "1" "beer" model.actors)))
+                           - (model.prices.pizza * (quickFloatConvert (demandsByCouncilAndGood "1" "pizza" model.actors)))
+
+        (cc1BudgetSurplusShow, cc1BudgetSurplusStyle) =
+          if cc1BudgetSurplus >= 0 then
+               ("OK", "green")
+          else
+               ("FAIL", "red")
+
+        cc2BudgetSurplus = (quickFloatConvert cc2budget)
+                           - (model.prices.beer * (quickFloatConvert (demandsByCouncilAndGood "2" "beer" model.actors)))
+                           - (model.prices.pizza * (quickFloatConvert (demandsByCouncilAndGood "2" "pizza" model.actors)))
+
+        (cc2BudgetSurplusShow, cc2BudgetSurplusStyle) =
+          if cc2BudgetSurplus >= 0 then
+               ("OK", "green")
+          else
+               ("FAIL", "red")
+
+        cc3BudgetSurplus = (quickFloatConvert cc3budget)
+                           - (model.prices.beer * (quickFloatConvert (demandsByCouncilAndGood "3" "beer" model.actors)))
+                           - (model.prices.pizza * (quickFloatConvert (demandsByCouncilAndGood "3" "pizza" model.actors)))
+
+        (cc3BudgetSurplusShow, cc3BudgetSurplusStyle) =
+          if cc3BudgetSurplus >= 0 then
+               ("OK", "green")
+          else
+               ("FAIL", "red")
     in
         [ td
             [ style "padding" "30px"
@@ -566,6 +602,15 @@ showStats model =
             , p [] [ text ("Beer Results: " ++ beerRangeMin ++ " | " ++ beerRangeMax) ]
             , b [ style "color" beerRangeResultStyle ]
                 [ text beerRangeResultShow ]
+            , p [] [ text ("CC1 budget surplus: " ++ String.fromFloat cc1BudgetSurplus )]
+            , b [ style "color" cc1BudgetSurplusStyle ]
+                [ text cc1BudgetSurplusShow ]
+            , p [] [ text ("CC2 budget surplus: " ++ String.fromFloat cc2BudgetSurplus )]
+            , b [ style "color" cc2BudgetSurplusStyle ]
+                [ text cc2BudgetSurplusShow ]
+            , p [] [ text ("CC3 budget surplus: " ++ String.fromFloat cc3BudgetSurplus )]
+            , b [ style "color" cc3BudgetSurplusStyle ]
+                [ text cc3BudgetSurplusShow ]
             ]
         ]
 
