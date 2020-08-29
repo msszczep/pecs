@@ -51,6 +51,7 @@ type alias Model =
     , tempBeers : String
     , tempWorkHours : String
     , tempQuestionFormId : Int
+    , iterationsArchive : List (List Actor)
     }
 
 
@@ -61,7 +62,7 @@ newPriceVector =
 
 init : Model
 init =
-    Model [] newPriceVector "" "" "" "" "" "" "" "" 0
+    Model [] newPriceVector "" "" "" "" "" "" "" "" 0 []
 
 
 newActor : Int -> String -> String -> String -> Int -> String -> Actor
@@ -455,6 +456,11 @@ priceRangeFunction val1 val2 =
         ( isInRange, ( String.fromFloat minFinalRange, String.fromFloat maxFinalRange ) )
 
 
+isActorComplete : Actor -> Bool
+isActorComplete a =
+    a.hoursToWork /= "0" && a.numBeersWanted /= "0" && a.numPizzasWanted /= "0"
+
+
 showStats : Model -> List (Html msg)
 showStats model =
     let
@@ -571,6 +577,15 @@ showStats model =
                 ( "OK", "green" )
             else
                 ( "FAIL", "red" )
+
+        isIterationComplete = List.all isActorComplete model.actors && (List.length model.actors > 0)
+
+        isIterationCompleteShow = if isIterationComplete then "complete" else "incomplete"
+
+        isIterationSuccessful = beerRangeResult && pizzaRangeResult && (cc1BudgetSurplus >= 0) && (cc2BudgetSurplus >= 0) && (cc3BudgetSurplus >= 0)
+
+        isIterationSuccessfulShow = if isIterationSuccessful then "YES" else "NO"
+
     in
         [ td
             [ style "padding" "30px"
@@ -604,6 +619,7 @@ showStats model =
             , style "vertical-align" "text-top"
             ]
             [ b [] [ text "Final iteration status" ]
+            , p [] [ text ("Iteration " ++ isIterationCompleteShow) ]
             , p [] [ text ("Pizza Results: " ++ pizzaRangeMin ++ " | " ++ pizzaRangeMax) ]
             , b [ style "color" pizzaRangeResultStyle ]
                 [ text pizzaRangeResultShow ]
@@ -619,6 +635,8 @@ showStats model =
             , p [] [ text ("CC3 budget surplus: " ++ String.fromFloat cc3BudgetSurplus) ]
             , b [ style "color" cc3BudgetSurplusStyle ]
                 [ text cc3BudgetSurplusShow ]
+            , p [] []
+            , b [] [text ("Successful? " ++ isIterationSuccessfulShow)]
             ]
         ]
 
