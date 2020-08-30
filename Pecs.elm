@@ -245,6 +245,8 @@ update msg model =
                 , pizzaPrice = adjustPrice "pizza" model
             }
 
+
+
 -- VIEW
 
 
@@ -466,23 +468,26 @@ resetActor a =
         , numPizzasWanted = "0"
     }
 
+
 sumWorkHours : String -> List Actor -> String
 sumWorkHours t actors =
     actors
-    |> List.filter (\c -> c.wc == t)
-    |> List.map .hoursToWork
-    |> List.map String.toInt
-    |> List.map (Maybe.withDefault 0)
-    |> List.foldl (+) 0
-    |> String.fromInt
+        |> List.filter (\c -> c.wc == t)
+        |> List.map .hoursToWork
+        |> List.map String.toInt
+        |> List.map (Maybe.withDefault 0)
+        |> List.foldl (+) 0
+        |> String.fromInt
+
 
 calculatePizzaSupply : String -> String
 calculatePizzaSupply pizzaHours =
     pizzaHours
-    |> String.toInt
-    |> Maybe.withDefault 0
-    |> (*) 2
-    |> String.fromInt
+        |> String.toInt
+        |> Maybe.withDefault 0
+        |> (*) 2
+        |> String.fromInt
+
 
 calculateDemand : String -> List Actor -> String
 calculateDemand t actors =
@@ -493,42 +498,70 @@ calculateDemand t actors =
             else
                 .numPizzasWanted
     in
-       actors
-       |> List.map goodToUse
-       |> List.map String.toInt
-       |> List.map (Maybe.withDefault 0)
-       |> List.foldl (+) 0
-       |> String.fromInt
+        actors
+            |> List.map goodToUse
+            |> List.map String.toInt
+            |> List.map (Maybe.withDefault 0)
+            |> List.foldl (+) 0
+            |> String.fromInt
 
 
 adjustPrice : String -> Model -> Float
 adjustPrice t model =
     let
-      pizzaHours = sumWorkHours "pizza" model.actors
-      beerHours = sumWorkHours "beer" model.actors
-      supply = (if t == "pizza" then calculatePizzaSupply pizzaHours else beerHours) |> String.toInt |> Maybe.withDefault 0
-      demand = calculateDemand t model.actors |> String.toInt |> Maybe.withDefault 0
-      priceToAdjust = if t == "pizza" then model.pizzaPrice else model.beerPrice
-      adjustmentValue = if demand > supply then 2 else (-2)
+        pizzaHours =
+            sumWorkHours "pizza" model.actors
+
+        beerHours =
+            sumWorkHours "beer" model.actors
+
+        supply =
+            (if t == "pizza" then
+                calculatePizzaSupply pizzaHours
+             else
+                beerHours
+            )
+                |> String.toInt
+                |> Maybe.withDefault 0
+
+        demand =
+            calculateDemand t model.actors |> String.toInt |> Maybe.withDefault 0
+
+        priceToAdjust =
+            if t == "pizza" then
+                model.pizzaPrice
+            else
+                model.beerPrice
+
+        adjustmentValue =
+            if demand > supply then
+                2
+            else
+                (-2)
     in
-      priceToAdjust + adjustmentValue
+        priceToAdjust + adjustmentValue
 
 
 showStats : Model -> List (Html Msg)
 showStats model =
     let
-        pizzaHours = sumWorkHours "pizza" model.actors
+        pizzaHours =
+            sumWorkHours "pizza" model.actors
 
-        beerHours = sumWorkHours "beer" model.actors
+        beerHours =
+            sumWorkHours "beer" model.actors
 
-        pizzaSupply = calculatePizzaSupply pizzaHours
+        pizzaSupply =
+            calculatePizzaSupply pizzaHours
 
         beerSupply =
             beerHours
 
-        pizzaDemand = calculateDemand "pizza" model.actors
+        pizzaDemand =
+            calculateDemand "pizza" model.actors
 
-        beerDemand = calculateDemand "beer" model.actors
+        beerDemand =
+            calculateDemand "beer" model.actors
 
         hiLoSum =
             model.actors
@@ -600,20 +633,29 @@ showStats model =
             else
                 ( "FAIL", "red" )
 
-        isIterationComplete = List.all isActorComplete model.actors && (List.length model.actors > 0)
+        isIterationComplete =
+            List.all isActorComplete model.actors && (List.length model.actors > 0)
 
-        isIterationCompleteShow = if isIterationComplete then "complete" else "incomplete"
+        isIterationCompleteShow =
+            if isIterationComplete then
+                "complete"
+            else
+                "incomplete"
 
-        isIterationSuccessful = beerRangeResult && pizzaRangeResult && (cc1BudgetSurplus >= 0) && (cc2BudgetSurplus >= 0) && (cc3BudgetSurplus >= 0)
+        isIterationSuccessful =
+            beerRangeResult && pizzaRangeResult && (cc1BudgetSurplus >= 0) && (cc2BudgetSurplus >= 0) && (cc3BudgetSurplus >= 0)
 
-        isIterationSuccessfulShow = if isIterationSuccessful then "YES" else "NO"
+        isIterationSuccessfulShow =
+            if isIterationSuccessful then
+                "YES"
+            else
+                "NO"
 
         iterationButton =
-           if isIterationComplete == True && isIterationSuccessful == False then
-             button [ onClick ResetIteration ] [text "Iterate"]
-           else
-             div [] []
-
+            if isIterationComplete == True && isIterationSuccessful == False then
+                button [ onClick ResetIteration ] [ text "Iterate" ]
+            else
+                div [] []
     in
         [ td
             [ style "padding" "30px"
@@ -664,7 +706,7 @@ showStats model =
             , b [ style "color" cc3BudgetSurplusStyle ]
                 [ text cc3BudgetSurplusShow ]
             , p [] []
-            , b [] [text ("Successful? " ++ isIterationSuccessfulShow)]
+            , b [] [ text ("Successful? " ++ isIterationSuccessfulShow) ]
             , p [] []
             , iterationButton
             ]
