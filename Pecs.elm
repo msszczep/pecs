@@ -33,15 +33,10 @@ type alias Actor =
     }
 
 
-type alias Prices =
-    { pizza : Float
-    , beer : Float
-    }
-
-
 type alias Model =
     { actors : List Actor
-    , prices : Prices
+    , beerPrice : Float
+    , pizzaPrice : Float
     , currentPane : String
     , tempCc : String
     , tempWc : String
@@ -55,14 +50,9 @@ type alias Model =
     }
 
 
-newPriceVector : Prices
-newPriceVector =
-    Prices 10.0 10.0
-
-
 init : Model
 init =
-    Model [] newPriceVector "" "" "" "" "" "" "" "" 0 []
+    Model [] 10.0 10.0 "" "" "" "" "" "" "" "" 0 []
 
 
 newActor : Int -> String -> String -> String -> Int -> String -> Actor
@@ -137,6 +127,7 @@ type Msg
     | UpdateWCForm Int
     | UpdateActor String
     | SelectWorkHours String
+    | ResetIteration
 
 
 getOneActor : List Actor -> Actor
@@ -246,7 +237,13 @@ update msg model =
                 , currentPane = "ShowCouncils"
             }
 
-
+        ResetIteration ->
+            { model
+                | iterationsArchive = model.actors :: model.iterationsArchive
+                , actors = List.map resetActor model.actors
+                , beerPrice = adjustPrice "beer" model
+                , pizzaPrice = adjustPrice "pizza" model
+            }
 
 -- VIEW
 
@@ -461,52 +458,77 @@ isActorComplete a =
     a.hoursToWork /= "0" && a.numBeersWanted /= "0" && a.numPizzasWanted /= "0"
 
 
-showStats : Model -> List (Html msg)
+resetActor : Actor -> Actor
+resetActor a =
+    { a
+        | hoursToWork = "0"
+        , numBeersWanted = "0"
+        , numPizzasWanted = "0"
+    }
+
+sumWorkHours : String -> List Actor -> String
+sumWorkHours t actors =
+    actors
+    |> List.filter (\c -> c.wc == t)
+    |> List.map .hoursToWork
+    |> List.map String.toInt
+    |> List.map (Maybe.withDefault 0)
+    |> List.foldl (+) 0
+    |> String.fromInt
+
+calculatePizzaSupply : String -> String
+calculatePizzaSupply pizzaHours =
+    pizzaHours
+    |> String.toInt
+    |> Maybe.withDefault 0
+    |> (*) 2
+    |> String.fromInt
+
+calculateDemand : String -> List Actor -> String
+calculateDemand t actors =
+    let
+        goodToUse =
+            if t == "beer" then
+                .numBeersWanted
+            else
+                .numPizzasWanted
+    in
+       actors
+       |> List.map goodToUse
+       |> List.map String.toInt
+       |> List.map (Maybe.withDefault 0)
+       |> List.foldl (+) 0
+       |> String.fromInt
+
+
+adjustPrice : String -> Model -> Float
+adjustPrice t model =
+    let
+      pizzaHours = sumWorkHours "pizza" model.actors
+      beerHours = sumWorkHours "beer" model.actors
+      supply = (if t == "pizza" then calculatePizzaSupply pizzaHours else beerHours) |> String.toInt |> Maybe.withDefault 0
+      demand = calculateDemand t model.actors |> String.toInt |> Maybe.withDefault 0
+      priceToAdjust = if t == "pizza" then model.pizzaPrice else model.beerPrice
+      adjustmentValue = if demand > supply then 2 else (-2)
+    in
+      priceToAdjust + adjustmentValue
+
+
+showStats : Model -> List (Html Msg)
 showStats model =
     let
-        pizzaHours =
-            model.actors
-                |> List.filter (\c -> c.wc == "pizza")
-                |> List.map .hoursToWork
-                |> List.map String.toInt
-                |> List.map (Maybe.withDefault 0)
-                |> List.foldl (+) 0
-                |> String.fromInt
+        pizzaHours = sumWorkHours "pizza" model.actors
 
-        beerHours =
-            model.actors
-                |> List.filter (\c -> c.wc == "beer")
-                |> List.map .hoursToWork
-                |> List.map String.toInt
-                |> List.map (Maybe.withDefault 0)
-                |> List.foldl (+) 0
-                |> String.fromInt
+        beerHours = sumWorkHours "beer" model.actors
 
-        pizzaSupply =
-            pizzaHours
-                |> String.toInt
-                |> Maybe.withDefault 0
-                |> (*) 2
-                |> String.fromInt
+        pizzaSupply = calculatePizzaSupply pizzaHours
 
         beerSupply =
             beerHours
 
-        pizzaDemand =
-            model.actors
-                |> List.map .numPizzasWanted
-                |> List.map String.toInt
-                |> List.map (Maybe.withDefault 0)
-                |> List.foldl (+) 0
-                |> String.fromInt
+        pizzaDemand = calculateDemand "pizza" model.actors
 
-        beerDemand =
-            model.actors
-                |> List.map .numBeersWanted
-                |> List.map String.toInt
-                |> List.map (Maybe.withDefault 0)
-                |> List.foldl (+) 0
-                |> String.fromInt
+        beerDemand = calculateDemand "beer" model.actors
 
         hiLoSum =
             model.actors
@@ -547,8 +569,8 @@ showStats model =
 
         cc1BudgetSurplus =
             (quickFloatConvert cc1budget)
-                - (model.prices.beer * (quickFloatConvert (demandsByCouncilAndGood "1" "beer" model.actors)))
-                - (model.prices.pizza * (quickFloatConvert (demandsByCouncilAndGood "1" "pizza" model.actors)))
+                - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "beer" model.actors)))
+                - (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "pizza" model.actors)))
 
         ( cc1BudgetSurplusShow, cc1BudgetSurplusStyle ) =
             if cc1BudgetSurplus >= 0 then
@@ -558,8 +580,8 @@ showStats model =
 
         cc2BudgetSurplus =
             (quickFloatConvert cc2budget)
-                - (model.prices.beer * (quickFloatConvert (demandsByCouncilAndGood "2" "beer" model.actors)))
-                - (model.prices.pizza * (quickFloatConvert (demandsByCouncilAndGood "2" "pizza" model.actors)))
+                - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "beer" model.actors)))
+                - (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "pizza" model.actors)))
 
         ( cc2BudgetSurplusShow, cc2BudgetSurplusStyle ) =
             if cc2BudgetSurplus >= 0 then
@@ -569,8 +591,8 @@ showStats model =
 
         cc3BudgetSurplus =
             (quickFloatConvert cc3budget)
-                - (model.prices.beer * (quickFloatConvert (demandsByCouncilAndGood "3" "beer" model.actors)))
-                - (model.prices.pizza * (quickFloatConvert (demandsByCouncilAndGood "3" "pizza" model.actors)))
+                - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "3" "beer" model.actors)))
+                - (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "3" "pizza" model.actors)))
 
         ( cc3BudgetSurplusShow, cc3BudgetSurplusStyle ) =
             if cc3BudgetSurplus >= 0 then
@@ -585,6 +607,12 @@ showStats model =
         isIterationSuccessful = beerRangeResult && pizzaRangeResult && (cc1BudgetSurplus >= 0) && (cc2BudgetSurplus >= 0) && (cc3BudgetSurplus >= 0)
 
         isIterationSuccessfulShow = if isIterationSuccessful then "YES" else "NO"
+
+        iterationButton =
+           if isIterationComplete == True && isIterationSuccessful == False then
+             button [ onClick ResetIteration ] [text "Iterate"]
+           else
+             div [] []
 
     in
         [ td
@@ -605,8 +633,8 @@ showStats model =
             , style "vertical-align" "text-top"
             ]
             [ b [] [ text "Prices" ]
-            , p [] [ text ("Pizza: " ++ String.fromFloat model.prices.pizza) ]
-            , p [] [ text ("Beer: " ++ String.fromFloat model.prices.beer) ]
+            , p [] [ text ("Pizza: " ++ String.fromFloat model.pizzaPrice) ]
+            , p [] [ text ("Beer: " ++ String.fromFloat model.beerPrice) ]
             , b [] [ text "Supply stats" ]
             , p [] [ text ("Pizza supply: " ++ pizzaSupply) ]
             , p [] [ text ("Beer supply: " ++ beerSupply) ]
@@ -637,6 +665,8 @@ showStats model =
                 [ text cc3BudgetSurplusShow ]
             , p [] []
             , b [] [text ("Successful? " ++ isIterationSuccessfulShow)]
+            , p [] []
+            , iterationButton
             ]
         ]
 
