@@ -321,63 +321,65 @@ viewCouncil councilType actor =
 viewCCQuestions : Model -> Html Msg
 viewCCQuestions model =
     let
-       currentActor = List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
+        currentActor =
+            List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
     in
-      div []
-        [ p [] [ text (currentActor.name ++ ", how many pizzas do you want?") ]
-        , select [ onInput SelectPizzas ]
-            [ option [ value "0" ] [ text "Choose a number:" ]
-            , option [ value "1" ] [ text "1" ]
-            , option [ value "2" ] [ text "2" ]
-            , option [ value "3" ] [ text "3" ]
-            , option [ value "4" ] [ text "4" ]
-            , option [ value "5" ] [ text "5" ]
-            , option [ value "6" ] [ text "6" ]
-            , option [ value "7" ] [ text "7" ]
+        div []
+            [ p [] [ text (currentActor.name ++ ", how many pizzas do you want?") ]
+            , select [ onInput SelectPizzas ]
+                [ option [ value "0" ] [ text "Choose a number:" ]
+                , option [ value "1" ] [ text "1" ]
+                , option [ value "2" ] [ text "2" ]
+                , option [ value "3" ] [ text "3" ]
+                , option [ value "4" ] [ text "4" ]
+                , option [ value "5" ] [ text "5" ]
+                , option [ value "6" ] [ text "6" ]
+                , option [ value "7" ] [ text "7" ]
+                ]
+            , p [] [ text "How many beers do you want?" ]
+            , select [ onInput SelectBeers ]
+                [ option [ value "0" ] [ text "Choose a number:" ]
+                , option [ value "1" ] [ text "1" ]
+                , option [ value "2" ] [ text "2" ]
+                , option [ value "3" ] [ text "3" ]
+                , option [ value "4" ] [ text "4" ]
+                , option [ value "5" ] [ text "5" ]
+                , option [ value "6" ] [ text "6" ]
+                , option [ value "7" ] [ text "7" ]
+                ]
+            , p [] []
+            , button
+                [ onClick (UpdateActor "cc") ]
+                [ text "Update Actor" ]
             ]
-        , p [] [ text "How many beers do you want?" ]
-        , select [ onInput SelectBeers ]
-            [ option [ value "0" ] [ text "Choose a number:" ]
-            , option [ value "1" ] [ text "1" ]
-            , option [ value "2" ] [ text "2" ]
-            , option [ value "3" ] [ text "3" ]
-            , option [ value "4" ] [ text "4" ]
-            , option [ value "5" ] [ text "5" ]
-            , option [ value "6" ] [ text "6" ]
-            , option [ value "7" ] [ text "7" ]
-            ]
-        , p [] []
-        , button
-            [ onClick (UpdateActor "cc") ]
-            [ text "Update Actor" ]
-        ]
 
 
 viewWCQuestions : Model -> Html Msg
 viewWCQuestions model =
     let
-       currentActor = List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
+        currentActor =
+            List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
     in
-       div []
-        [ p [] [ text (currentActor.name ++ ", how many hours do you want to work?") ]
-        , select [ onInput SelectWorkHours ]
-            [ option [ value "0" ] [ text "Choose a number:" ]
-            , option [ value "1" ] [ text "1" ]
-            , option [ value "2" ] [ text "2" ]
-            , option [ value "3" ] [ text "3" ]
-            , option [ value "4" ] [ text "4" ]
-            , option [ value "5" ] [ text "5" ]
-            , option [ value "6" ] [ text "6" ]
-            , option [ value "7" ] [ text "7" ]
-            , option [ value "8" ] [ text "8" ]
-            , option [ value "9" ] [ text "9" ]
-            , option [ value "10" ] [ text "10" ]
+        div []
+            [ p [] [ text (currentActor.name ++ ", how many hours do you want to work?") ]
+            , select [ onInput SelectWorkHours ]
+                [ option [ value "0" ] [ text "Choose a number:" ]
+                , option [ value "1" ] [ text "1" ]
+                , option [ value "2" ] [ text "2" ]
+                , option [ value "3" ] [ text "3" ]
+                , option [ value "4" ] [ text "4" ]
+                , option [ value "5" ] [ text "5" ]
+                , option [ value "6" ] [ text "6" ]
+                , option [ value "7" ] [ text "7" ]
+                , option [ value "8" ] [ text "8" ]
+                , option [ value "9" ] [ text "9" ]
+                , option [ value "10" ] [ text "10" ]
+                ]
+            , p [] []
+            , button
+                [ onClick (UpdateActor "wc") ]
+                [ text "Update Actor" ]
             ]
-        , p [] []
-        , button
-            [ onClick (UpdateActor "wc") ]
-            [ text "Update Actor" ]
-        ]
 
 
 quickIntConvert : String -> Int
@@ -388,7 +390,8 @@ quickIntConvert s =
 computeCcBudget : String -> String -> List Actor -> String
 computeCcBudget id hiLoThreshold actors =
     let
-        hiLoTemp = quickIntConvert hiLoThreshold
+        hiLoTemp =
+            quickIntConvert hiLoThreshold
 
         actorsInCouncil =
             actors
