@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
 import Tuple exposing (first, second)
+import Markdown
 import Random
 
 
@@ -800,6 +801,70 @@ viewAddActorForm model =
             [ text "Add Actor" ]
         ]
 
+instructions : String
+instructions = 
+   """
+This is a computerized version of the Participatory Economics Classroom Simulator (PECS),
+programmed in the Elm programming language by Mitchell Szczepanczyk, devised by Justin Jarvis 
+of Truman State University, and based on the economic model of participatory economics 
+co-invented by Michael Albert and Robin Hahnel.
+
+A participatory economy is an economic model of democratic planning, where participants craft
+a society-wide production, consumption, and allocation plan -- without the retentionist 
+economic institutions of markets or command planning.  This is done by means of worker 
+and consumer councils -- decision-making bodies for groups of individuals to decide what 
+and how much to produce and what and how much to consume.  These councils interact via a participatory 
+planning procedure to determine an allocation plan in one or more rounds ("iterations").
+
+In PECS, each individual joins a worker council to produce one of two goods (either pizza or beer)
+and a consumer council to aggregate the consumption of those goods.
+
+You can switch from one page to the next by clicking any of the buttons at the top of this
+page.  CAUTION: **_If you refresh the page or close the browser, doing so will delete the app's 
+current state, so be careful_**.
+
+Each individual participant ("actor") in PECS joins the simluation by clicking the "Add Actor" button
+at the top of the page.  Each actor answers some questions one time: their name, which consumer
+council they wish to join (identified simply by number -- 1, 2 or 3), which worker council they wish to join 
+(identified by the good they produce -- either pizza or beer), and a "HiLo" threshold 
+(a number to help calculate payment based on the number of hours each actor works).  Each actor
+then clicks the "Add Actor" button to join PECS.
+
+Upon joining PECS, each actor then sees a scoreboard of the state of the allocation plan in the current
+iteration, as well as a number of related statistics.  You can also see this scoreboard by clicking the "Show 
+Stats / Councils" button at the top of the page.  Each actor appears twice on the right-hand side of the 
+scoreboard: in the list of worker councils, and in the list of consumer councils.  By default, the 
+name appears inside of a red box with a corresponding "Enter Data" button.  When you click the "Enter Data" button,
+you're asked one or more questions, depending on the council type.  For a worker council, the actor is asked how
+many hours you want to work.  For a consumer council, the actor is asked how many pizzas and how many beers
+they wish to consume.  Each actor then clicks the "Update Actor" button to submit their response.
+
+After an actor submits their response, the "Enter Data" button disppears and the red box is now highlighted green.
+That shows that the actor has submitted their portion of the allocation plan for that council.
+The scoreboard provides a summary of the state of the allocation plan for a given iteration -- aggregating the 
+number of hours consumed, the budgets of each consumer council, the HiLo threshold (the average of all HiLo scores
+from all actors), the supply/demand/price of each good, and the overall iteration status.
+
+The production of each good takes only the number hours of labor as input.  A single pizza takes a half-hour of 
+labor as input; a single beer takes one hour of labor as input.  Each actor gets either 50 points if their number of work 
+hours is below the HiLo threshold, or 100 points if their number of work hours is at or above the HiLo threshold.
+The budget of each consumer council is the sum of the number of points of that council's actors.  The cost of 
+all the goods for a consumer council is the price of each good multiplied by the quantity of that good.  The 
+starting price of each good is ten points. 
+
+The supply and demand of each good must be within ten percent of each other.  The acceptable quantity range
+for each good appears in the "Final iteration status" column on the scoreboard.  The simulation ends when the
+supply and demand of each good is within ten percent of each other _and_ when each consumer council is at or under
+its budget.  We then have a production plan and production can begin.  If we don't have a production plan, 
+an "Iterate" button appears on the page; if you click on that, you archive the current iteration round and start
+a new round where you ask each actor to revise the number of work hours and the number of goods to consume.
+In addition, a good's price is adjusted down two points if the supply for that good is greater than its demand, or increased two points if demand is greater than supply.
+
+The "Debug" button at the top shows the current state of the app at any given point.  The source code for
+the app is [online here](https://github.com/msszczep/pecs).
+
+   """
+
 
 view : Model -> Html Msg
 view model =
@@ -815,13 +880,13 @@ view model =
                         [ text "Add Actor" ]
                     , button
                         [ onClick ShowCouncilsPane ]
-                        [ text "Show Councils" ]
+                        [ text "Show Stats / Councils" ]
                     , button
                         [ onClick ShowDebugPane ]
                         [ text "Debug" ]
-                    , button
-                        [ onClick ApplyTestActors ]
-                        [ text "Test Actors" ]
+--                    , button
+--                        [ onClick ApplyTestActors ]
+--                        [ text "Test Actors" ]
                     ]
                 ]
             , td []
@@ -843,7 +908,9 @@ view model =
                         p [] [ text (toString model) ]
 
                     _ ->
-                        p [] [ text "instructions go here" ]
+                        Markdown.toHtml 
+                        [ style "padding" "20px" 
+                        ] instructions
                 ]
             ]
         ]
