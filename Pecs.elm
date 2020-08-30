@@ -318,14 +318,13 @@ viewCouncil councilType actor =
             ]
 
 
-
--- TODO Add name in output:
-
-
 viewCCQuestions : Model -> Html Msg
 viewCCQuestions model =
-    div []
-        [ p [] [ text "How many pizzas do you want?" ]
+    let
+       currentActor = List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
+    in
+      div []
+        [ p [] [ text (currentActor.name ++ ", how many pizzas do you want?") ]
         , select [ onInput SelectPizzas ]
             [ option [ value "0" ] [ text "Choose a number:" ]
             , option [ value "1" ] [ text "1" ]
@@ -354,14 +353,13 @@ viewCCQuestions model =
         ]
 
 
-
--- # TODO: Add name in output:
-
-
 viewWCQuestions : Model -> Html Msg
 viewWCQuestions model =
-    div []
-        [ p [] [ text "How many hours do you want to work?" ]
+    let
+       currentActor = List.filter (\e -> e.id == model.tempQuestionFormId) model.actors |> getOneActor
+    in
+       div []
+        [ p [] [ text (currentActor.name ++ ", how many hours do you want to work?") ]
         , select [ onInput SelectWorkHours ]
             [ option [ value "0" ] [ text "Choose a number:" ]
             , option [ value "1" ] [ text "1" ]
@@ -382,27 +380,25 @@ viewWCQuestions model =
         ]
 
 
-
--- TODO : Fix hoursToWork and hiLoThreshold to be numbers
+quickIntConvert : String -> Int
+quickIntConvert s =
+    String.toInt s |> Maybe.withDefault 0
 
 
 computeCcBudget : String -> String -> List Actor -> String
 computeCcBudget id hiLoThreshold actors =
     let
+        hiLoTemp = quickIntConvert hiLoThreshold
+
         actorsInCouncil =
             actors
                 |> List.filter (\c -> c.cc == id)
                 |> List.filter (\c -> c.hoursToWork /= "0")
 
         hiLoCouncils =
-            List.partition (\x -> x.hoursToWork < hiLoThreshold) actorsInCouncil
+            List.partition (\x -> (quickIntConvert x.hoursToWork) < hiLoTemp) actorsInCouncil
     in
         (List.length (first hiLoCouncils) * 50) + (List.length (second hiLoCouncils) * 100) |> String.fromInt
-
-
-quickIntConvert : String -> Int
-quickIntConvert s =
-    String.toInt s |> Maybe.withDefault 0
 
 
 quickFloatConvert : String -> Float
