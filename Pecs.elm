@@ -657,88 +657,94 @@ showStatsTables model =
             else
                 div [] []
     in
-        [ td [ style "vertical-align" "text-top" ] [
-          div [] [
-          table [ ] [
-            tr [ ] [
-              th [] [ text "" ],
-              th [] [ text "Price" ],
-              th [] [ text "Supply" ],
-              th [] [ text "Demand" ],
-              th [] [ text "Range*" ],
-              th [] [ text "OK?" ]
-            ], 
-            tr [] [
-              td [style "border" "1px solid black"] [ text "Pizza" ],
-              td [] [ text (toString model.pizzaPrice) ],
-              td [] [ text pizzaSupply ],
-              td [] [ text pizzaDemand ],
-              td [] [ text (pizzaRangeMin ++ " - " ++ pizzaRangeMax) ],
-              td [] [ b [ style "color" pizzaRangeResultStyle ]
-                [ text pizzaRangeResultShow ]
-              ]
-            ],
-            tr [] [
-              td [] [ text "Beer" ],
-              td [] [ text (toString model.beerPrice) ],
-              td [] [ text beerSupply ],
-              td [] [ text beerDemand ],
-              td [] [ text (beerRangeMin ++ " - " ++ beerRangeMax) ],
-              td [] [ b [ style "color" beerRangeResultStyle ]
-                [ text beerRangeResultShow ]
-              ]
+        [ td [ style "vertical-align" "text-top" ]
+            [ div []
+                [ table []
+                    [ tr []
+                        [ th [] [ text "" ]
+                        , th [] [ text "Price" ]
+                        , th [] [ text "Supply" ]
+                        , th [] [ text "Demand" ]
+                        , th [] [ text "Range*" ]
+                        , th [] [ text "OK?" ]
+                        ]
+                    , tr []
+                        [ td [ style "border" "1px solid black" ] [ text "Pizza" ]
+                        , td [] [ text (toString model.pizzaPrice) ]
+                        , td [] [ text pizzaSupply ]
+                        , td [] [ text pizzaDemand ]
+                        , td [] [ text (pizzaRangeMin ++ " - " ++ pizzaRangeMax) ]
+                        , td []
+                            [ b [ style "color" pizzaRangeResultStyle ]
+                                [ text pizzaRangeResultShow ]
+                            ]
+                        ]
+                    , tr []
+                        [ td [] [ text "Beer" ]
+                        , td [] [ text (toString model.beerPrice) ]
+                        , td [] [ text beerSupply ]
+                        , td [] [ text beerDemand ]
+                        , td [] [ text (beerRangeMin ++ " - " ++ beerRangeMax) ]
+                        , td []
+                            [ b [ style "color" beerRangeResultStyle ]
+                                [ text beerRangeResultShow ]
+                            ]
+                        ]
+                    ]
+                , p [] []
+                , table []
+                    [ tr []
+                        [ th [] [ text "CC" ]
+                        , th [] [ text "Budget" ]
+                        , th [] [ text "Surplus" ]
+                        , th [] [ text "OK?" ]
+                        ]
+                    , tr []
+                        [ td [ style "border" "1px solid black" ] [ text "CC1" ]
+                        , td [] [ text cc1budget ]
+                        , td [] [ text (toString cc1BudgetSurplus) ]
+                        , td []
+                            [ b [ style "color" cc1BudgetSurplusStyle ]
+                                [ text cc1BudgetSurplusShow ]
+                            ]
+                        ]
+                    , tr []
+                        [ td [ style "border" "1px solid black" ] [ text "CC2" ]
+                        , td [] [ text cc2budget ]
+                        , td [] [ text (toString cc2BudgetSurplus) ]
+                        , td []
+                            [ b [ style "color" cc2BudgetSurplusStyle ]
+                                [ text cc2BudgetSurplusShow ]
+                            ]
+                        ]
+                    , tr []
+                        [ td [ style "border" "1px solid black" ] [ text "CC3" ]
+                        , td [] [ text cc3budget ]
+                        , td [] [ text (toString cc3BudgetSurplus) ]
+                        , td []
+                            [ b [ style "color" cc3BudgetSurplusStyle ]
+                                [ text cc3BudgetSurplusShow ]
+                            ]
+                        ]
+                    ]
+                , p [] []
+                , table []
+                    [ tr []
+                        [ th [] [ text "WC" ]
+                        , th [] [ text "Hours" ]
+                        ]
+                    , tr []
+                        [ td [ style "border" "1px solid black" ] [ text "Pizza" ]
+                        , td [] [ text pizzaHours ]
+                        ]
+                    , tr []
+                        [ td [ style "border" "1px solid black" ] [ text "Beer" ]
+                        , td [] [ text beerHours ]
+                        ]
+                    ]
+                ]
             ]
-          ],
-          p [] [],
-          table [ ] [
-            tr [ ] [
-              th [] [ text "CC" ],
-              th [] [ text "Budget" ],
-              th [] [ text "Surplus" ],
-              th [] [ text "OK?" ]
-            ],
-            tr [] [
-              td [style "border" "1px solid black"] [ text "CC1" ],
-              td [] [ text cc1budget ],
-              td [] [ text (toString cc1BudgetSurplus) ],
-              td [] [ b [ style "color" cc1BudgetSurplusStyle ]
-                [ text cc1BudgetSurplusShow ]
-              ]
-            ],
-            tr [] [
-              td [style "border" "1px solid black"] [ text "CC2" ],
-              td [] [ text cc2budget ],
-              td [] [ text (toString cc2BudgetSurplus) ],
-              td [] [ b [ style "color" cc2BudgetSurplusStyle ]
-                [ text cc2BudgetSurplusShow ]
-              ]
-            ],
-            tr [] [
-              td [style "border" "1px solid black"] [ text "CC3" ],
-              td [] [ text cc3budget ],
-              td [] [ text (toString cc3BudgetSurplus) ],
-              td [] [ b [ style "color" cc3BudgetSurplusStyle ]
-                [ text cc3BudgetSurplusShow ]
-              ]
-            ]
-          ],
-          p [] [],
-          table [ ] [
-            tr [ ] [
-              th [] [ text "WC" ],
-              th [] [ text "Hours" ]
-            ],
-            tr [] [
-              td [style "border" "1px solid black"] [ text "Pizza" ],
-              td [] [ text pizzaHours ]             
-            ],
-            tr [] [
-              td [style "border" "1px solid black"] [ text "Beer" ],
-              td [] [ text beerHours ]
-            ]
-          ]
         ]
-      ]]
 
 
 viewCouncils : Model -> Html Msg
@@ -888,7 +894,7 @@ a new round where you ask each actor to revise the number of work hours and the 
 In addition, a good's price is adjusted down two points if the supply for that good is greater than its demand,
 or increased two points if demand is greater than supply.
 
-The "Debug" button at the top shows the current state of the app at any given point.  The source code for the app 
+The "Debug" button at the top shows the current state of the app at any given point.  The source code for the app
 is written in the Elm programming language and is [online here](https://github.com/msszczep/pecs).
 
    """
@@ -912,10 +918,9 @@ view model =
                     , button
                         [ onClick ShowDebugPane ]
                         [ text "Debug" ]
-
-                                        , button
-                                            [ onClick ApplyTestActors ]
-                                            [ text "Test Actors" ]
+                    , button
+                        [ onClick ApplyTestActors ]
+                        [ text "Test Actors" ]
                     ]
                 ]
             , td []
