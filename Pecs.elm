@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, text, p, table, tr, td, h2, br, b, input, select, option)
+import Html exposing (Html, button, div, text, p, table, tr, td, th, h2, br, b, input, select, option)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
@@ -542,8 +542,8 @@ adjustPrice t model =
         priceToAdjust + adjustmentValue
 
 
-showStats : Model -> List (Html Msg)
-showStats model =
+showStatsTables : Model -> List (Html Msg)
+showStatsTables model =
     let
         pizzaHours =
             sumWorkHours "pizza" model.actors
@@ -657,60 +657,88 @@ showStats model =
             else
                 div [] []
     in
-        [ td
-            [ style "padding" "30px"
-            , style "vertical-align" "text-top"
-            ]
-            [ b [] [ text "Work council stats" ]
-            , p [] [ text ("Pizza council workhours: " ++ pizzaHours) ]
-            , p [] [ text ("Beer council workhours: " ++ beerHours) ]
-            , b [] [ text "Consumer council budgets:" ]
-            , p [] [ text ("CC1: " ++ cc1budget) ]
-            , p [] [ text ("CC2: " ++ cc2budget) ]
-            , p [] [ text ("CC3: " ++ cc3budget) ]
-            , b [] [ text ("HiLo Threshold: " ++ hiLoAvg) ]
-            ]
-        , td
-            [ style "padding" "30px"
-            , style "vertical-align" "text-top"
-            ]
-            [ b [] [ text "Prices" ]
-            , p [] [ text ("Pizza: " ++ String.fromFloat model.pizzaPrice) ]
-            , p [] [ text ("Beer: " ++ String.fromFloat model.beerPrice) ]
-            , b [] [ text "Supply stats" ]
-            , p [] [ text ("Pizza supply: " ++ pizzaSupply) ]
-            , p [] [ text ("Beer supply: " ++ beerSupply) ]
-            , b [] [ text "Demand stats" ]
-            , p [] [ text ("Pizza demand: " ++ pizzaDemand) ]
-            , p [] [ text ("Beer demand: " ++ beerDemand) ]
-            ]
-        , td
-            [ style "padding" "30px"
-            , style "vertical-align" "text-top"
-            ]
-            [ b [] [ text "Final iteration status" ]
-            , p [] [ text ("Iteration " ++ isIterationCompleteShow) ]
-            , p [] [ text ("Pizza Results: " ++ pizzaRangeMin ++ " | " ++ pizzaRangeMax) ]
-            , b [ style "color" pizzaRangeResultStyle ]
+        [ td [ style "vertical-align" "text-top" ] [
+          div [] [
+          table [ ] [
+            tr [ ] [
+              th [] [ text "" ],
+              th [] [ text "Price" ],
+              th [] [ text "Supply" ],
+              th [] [ text "Demand" ],
+              th [] [ text "Range*" ],
+              th [] [ text "OK?" ]
+            ], 
+            tr [] [
+              td [style "border" "1px solid black"] [ text "Pizza" ],
+              td [] [ text (toString model.pizzaPrice) ],
+              td [] [ text pizzaSupply ],
+              td [] [ text pizzaDemand ],
+              td [] [ text (pizzaRangeMin ++ " - " ++ pizzaRangeMax) ],
+              td [] [ b [ style "color" pizzaRangeResultStyle ]
                 [ text pizzaRangeResultShow ]
-            , p [] [ text ("Beer Results: " ++ beerRangeMin ++ " | " ++ beerRangeMax) ]
-            , b [ style "color" beerRangeResultStyle ]
+              ]
+            ],
+            tr [] [
+              td [] [ text "Beer" ],
+              td [] [ text (toString model.beerPrice) ],
+              td [] [ text beerSupply ],
+              td [] [ text beerDemand ],
+              td [] [ text (beerRangeMin ++ " - " ++ beerRangeMax) ],
+              td [] [ b [ style "color" beerRangeResultStyle ]
                 [ text beerRangeResultShow ]
-            , p [] [ text ("CC1 budget surplus: " ++ String.fromFloat cc1BudgetSurplus) ]
-            , b [ style "color" cc1BudgetSurplusStyle ]
-                [ text cc1BudgetSurplusShow ]
-            , p [] [ text ("CC2 budget surplus: " ++ String.fromFloat cc2BudgetSurplus) ]
-            , b [ style "color" cc2BudgetSurplusStyle ]
-                [ text cc2BudgetSurplusShow ]
-            , p [] [ text ("CC3 budget surplus: " ++ String.fromFloat cc3BudgetSurplus) ]
-            , b [ style "color" cc3BudgetSurplusStyle ]
-                [ text cc3BudgetSurplusShow ]
-            , p [] []
-            , b [] [ text ("Successful? " ++ isIterationSuccessfulShow) ]
-            , p [] []
-            , iterationButton
+              ]
             ]
+          ],
+          p [] [],
+          table [ ] [
+            tr [ ] [
+              th [] [ text "CC" ],
+              th [] [ text "Budget" ],
+              th [] [ text "Surplus" ],
+              th [] [ text "OK?" ]
+            ],
+            tr [] [
+              td [style "border" "1px solid black"] [ text "CC1" ],
+              td [] [ text cc1budget ],
+              td [] [ text (toString cc1BudgetSurplus) ],
+              td [] [ b [ style "color" cc1BudgetSurplusStyle ]
+                [ text cc1BudgetSurplusShow ]
+              ]
+            ],
+            tr [] [
+              td [style "border" "1px solid black"] [ text "CC2" ],
+              td [] [ text cc2budget ],
+              td [] [ text (toString cc2BudgetSurplus) ],
+              td [] [ b [ style "color" cc2BudgetSurplusStyle ]
+                [ text cc2BudgetSurplusShow ]
+              ]
+            ],
+            tr [] [
+              td [style "border" "1px solid black"] [ text "CC3" ],
+              td [] [ text cc3budget ],
+              td [] [ text (toString cc3BudgetSurplus) ],
+              td [] [ b [ style "color" cc3BudgetSurplusStyle ]
+                [ text cc3BudgetSurplusShow ]
+              ]
+            ]
+          ],
+          p [] [],
+          table [ ] [
+            tr [ ] [
+              th [] [ text "WC" ],
+              th [] [ text "Hours" ]
+            ],
+            tr [] [
+              td [style "border" "1px solid black"] [ text "Pizza" ],
+              td [] [ text pizzaHours ]             
+            ],
+            tr [] [
+              td [style "border" "1px solid black"] [ text "Beer" ],
+              td [] [ text beerHours ]
+            ]
+          ]
         ]
+      ]]
 
 
 viewCouncils : Model -> Html Msg
@@ -733,7 +761,7 @@ viewCouncils model =
     in
         table []
             [ tr []
-                (List.append (showStats model)
+                (List.append (showStatsTables model)
                     [ td
                         [ style "padding" "30px"
                         , style "vertical-align" "text-top"
@@ -806,9 +834,7 @@ instructions : String
 instructions =
     """
 This is a computerized version of the Participatory Economics Classroom Simulator (PECS),
-programmed in the Elm programming language by Mitchell Szczepanczyk, devised by Justin Jarvis
-of Truman State University, and based on the economic model of participatory economics
-co-invented by Michael Albert and Robin Hahnel.
+programmed by Mitchell Szczepanczyk, devised by Justin Jarvis, and based on the economic model of a participatory economy co-invented by Michael Albert and Robin Hahnel.
 
 A participatory economy is an economic model of democratic planning, where participants craft
 a society-wide production, consumption, and allocation plan -- without the retentionist
@@ -862,8 +888,8 @@ a new round where you ask each actor to revise the number of work hours and the 
 In addition, a good's price is adjusted down two points if the supply for that good is greater than its demand,
 or increased two points if demand is greater than supply.
 
-The "Debug" button at the top shows the current state of the app at any given point.  The source code for
-the app is [online here](https://github.com/msszczep/pecs).
+The "Debug" button at the top shows the current state of the app at any given point.  The source code for the app 
+is written in the Elm programming language and is [online here](https://github.com/msszczep/pecs).
 
    """
 
@@ -887,9 +913,9 @@ view model =
                         [ onClick ShowDebugPane ]
                         [ text "Debug" ]
 
-                    --                    , button
-                    --                        [ onClick ApplyTestActors ]
-                    --                        [ text "Test Actors" ]
+                                        , button
+                                            [ onClick ApplyTestActors ]
+                                            [ text "Test Actors" ]
                     ]
                 ]
             , td []
