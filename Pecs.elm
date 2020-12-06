@@ -657,15 +657,17 @@ showStatsTables model =
             else
                 div [] []
 
-        tdStyle = 
-                  [ style "border" "1px solid #ddd"
-                  , style "padding" "8px"
-                  ]
-        thStyle = [ style "padding" "8px"
-                  , style "text-align" "center"
-                  , style "background-color" "#4CAF50"
-                  , style "color" "white"
-                  ]
+        tdStyle =
+            [ style "border" "1px solid #ddd"
+            , style "padding" "8px"
+            ]
+
+        thStyle =
+            [ style "padding" "8px"
+            , style "text-align" "center"
+            , style "background-color" "#23238E"
+            , style "color" "white"
+            ]
     in
         [ td [ style "vertical-align" "text-top" ]
             [ div []
@@ -733,7 +735,7 @@ showStatsTables model =
                         , td tdStyle [ text (toString cc3BudgetSurplus) ]
                         , td tdStyle
                             [ b [ style "color" cc3BudgetSurplusStyle ]
-                                [ text cc3BudgetSurplusShow]
+                                [ text cc3BudgetSurplusShow ]
                             ]
                         ]
                     ]
