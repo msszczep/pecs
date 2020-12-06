@@ -69,7 +69,7 @@ testActors =
       , id = 3
       , maxLeisureTime = 10
       , name = "Jason"
-      , numBeersWanted = "3"
+      , numBeersWanted = "4"
       , numPizzasWanted = "5"
       , wc = "beer"
       }
@@ -79,7 +79,7 @@ testActors =
       , id = 2
       , maxLeisureTime = 10
       , name = "Zachary"
-      , numBeersWanted = "1"
+      , numBeersWanted = "3"
       , numPizzasWanted = "4"
       , wc = "pizza"
       }
@@ -89,7 +89,7 @@ testActors =
       , id = 4
       , maxLeisureTime = 10
       , name = "Chris"
-      , numBeersWanted = "3"
+      , numBeersWanted = "4"
       , numPizzasWanted = "4"
       , wc = "beer"
       }
@@ -99,7 +99,7 @@ testActors =
       , id = 1
       , maxLeisureTime = 10
       , name = "Mitchell"
-      , numBeersWanted = "1"
+      , numBeersWanted = "4"
       , numPizzasWanted = "6"
       , wc = "pizza"
       }
@@ -656,36 +656,46 @@ showStatsTables model =
                 button [ onClick ResetIteration ] [ text "Iterate" ]
             else
                 div [] []
+
+        tdStyle = 
+                  [ style "border" "1px solid #ddd"
+                  , style "padding" "8px"
+                  ]
+        thStyle = [ style "padding" "8px"
+                  , style "text-align" "center"
+                  , style "background-color" "#4CAF50"
+                  , style "color" "white"
+                  ]
     in
         [ td [ style "vertical-align" "text-top" ]
             [ div []
                 [ table []
                     [ tr []
-                        [ th [] [ text "" ]
-                        , th [] [ text "Price" ]
-                        , th [] [ text "Supply" ]
-                        , th [] [ text "Demand" ]
-                        , th [] [ text "Range*" ]
-                        , th [] [ text "OK?" ]
+                        [ th thStyle [ text "Goods" ]
+                        , th thStyle [ text "Price" ]
+                        , th thStyle [ text "Supply" ]
+                        , th thStyle [ text "Demand" ]
+                        , th thStyle [ text "Range" ]
+                        , th thStyle [ text "OK?" ]
                         ]
                     , tr []
-                        [ td [ style "border" "1px solid black" ] [ text "Pizza" ]
-                        , td [] [ text (toString model.pizzaPrice) ]
-                        , td [] [ text pizzaSupply ]
-                        , td [] [ text pizzaDemand ]
-                        , td [] [ text (pizzaRangeMin ++ " - " ++ pizzaRangeMax) ]
-                        , td []
+                        [ td tdStyle [ text "Pizza" ]
+                        , td tdStyle [ text (toString model.pizzaPrice) ]
+                        , td tdStyle [ text pizzaSupply ]
+                        , td tdStyle [ text pizzaDemand ]
+                        , td tdStyle [ text (pizzaRangeMin ++ " - " ++ pizzaRangeMax) ]
+                        , td tdStyle
                             [ b [ style "color" pizzaRangeResultStyle ]
                                 [ text pizzaRangeResultShow ]
                             ]
                         ]
                     , tr []
-                        [ td [] [ text "Beer" ]
-                        , td [] [ text (toString model.beerPrice) ]
-                        , td [] [ text beerSupply ]
-                        , td [] [ text beerDemand ]
-                        , td [] [ text (beerRangeMin ++ " - " ++ beerRangeMax) ]
-                        , td []
+                        [ td tdStyle [ text "Beer" ]
+                        , td tdStyle [ text (toString model.beerPrice) ]
+                        , td tdStyle [ text beerSupply ]
+                        , td tdStyle [ text beerDemand ]
+                        , td tdStyle [ text (beerRangeMin ++ " - " ++ beerRangeMax) ]
+                        , td tdStyle
                             [ b [ style "color" beerRangeResultStyle ]
                                 [ text beerRangeResultShow ]
                             ]
@@ -694,54 +704,56 @@ showStatsTables model =
                 , p [] []
                 , table []
                     [ tr []
-                        [ th [] [ text "CC" ]
-                        , th [] [ text "Budget" ]
-                        , th [] [ text "Surplus" ]
-                        , th [] [ text "OK?" ]
+                        [ th thStyle [ text "CC" ]
+                        , th thStyle [ text "Budget" ]
+                        , th thStyle [ text "Surplus" ]
+                        , th thStyle [ text "OK?" ]
                         ]
                     , tr []
-                        [ td [ style "border" "1px solid black" ] [ text "CC1" ]
-                        , td [] [ text cc1budget ]
-                        , td [] [ text (toString cc1BudgetSurplus) ]
-                        , td []
+                        [ td tdStyle [ text "CC1" ]
+                        , td tdStyle [ text cc1budget ]
+                        , td tdStyle [ text (toString cc1BudgetSurplus) ]
+                        , td tdStyle
                             [ b [ style "color" cc1BudgetSurplusStyle ]
                                 [ text cc1BudgetSurplusShow ]
                             ]
                         ]
                     , tr []
-                        [ td [ style "border" "1px solid black" ] [ text "CC2" ]
-                        , td [] [ text cc2budget ]
-                        , td [] [ text (toString cc2BudgetSurplus) ]
-                        , td []
+                        [ td tdStyle [ text "CC2" ]
+                        , td tdStyle [ text cc2budget ]
+                        , td tdStyle [ text (toString cc2BudgetSurplus) ]
+                        , td tdStyle
                             [ b [ style "color" cc2BudgetSurplusStyle ]
                                 [ text cc2BudgetSurplusShow ]
                             ]
                         ]
                     , tr []
-                        [ td [ style "border" "1px solid black" ] [ text "CC3" ]
-                        , td [] [ text cc3budget ]
-                        , td [] [ text (toString cc3BudgetSurplus) ]
-                        , td []
+                        [ td tdStyle [ text "CC3" ]
+                        , td tdStyle [ text cc3budget ]
+                        , td tdStyle [ text (toString cc3BudgetSurplus) ]
+                        , td tdStyle
                             [ b [ style "color" cc3BudgetSurplusStyle ]
-                                [ text cc3BudgetSurplusShow ]
+                                [ text cc3BudgetSurplusShow]
                             ]
                         ]
                     ]
                 , p [] []
                 , table []
                     [ tr []
-                        [ th [] [ text "WC" ]
-                        , th [] [ text "Hours" ]
+                        [ th thStyle [ text "WC" ]
+                        , th thStyle [ text "Hours" ]
                         ]
                     , tr []
-                        [ td [ style "border" "1px solid black" ] [ text "Pizza" ]
-                        , td [] [ text pizzaHours ]
+                        [ td tdStyle [ text "Pizza" ]
+                        , td tdStyle [ text pizzaHours ]
                         ]
                     , tr []
-                        [ td [ style "border" "1px solid black" ] [ text "Beer" ]
-                        , td [] [ text beerHours ]
+                        [ td tdStyle [ text "Beer" ]
+                        , td tdStyle [ text beerHours ]
                         ]
                     ]
+                , p [] []
+                , iterationButton
                 ]
             ]
         ]
