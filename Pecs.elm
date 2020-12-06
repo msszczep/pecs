@@ -99,7 +99,7 @@ testActors =
       , id = 1
       , maxLeisureTime = 10
       , name = "Mitchell"
-      , numBeersWanted = "4"
+      , numBeersWanted = "1"
       , numPizzasWanted = "6"
       , wc = "pizza"
       }
@@ -129,6 +129,7 @@ type Msg
     | UpdateActor String
     | SelectWorkHours String
     | ResetIteration
+    | ResetAiIteration
 
 
 getOneActor : List Actor -> Actor
@@ -246,6 +247,13 @@ update msg model =
                 , pizzaPrice = adjustPrice "pizza" model
             }
 
+        ResetAiIteration ->
+            { model
+                | iterationsArchive = model.actors :: model.iterationsArchive
+                , actors = updateAiActors model
+                , beerPrice = adjustPrice "beer" model
+                , pizzaPrice = adjustPrice "pizza" model
+            }
 
 
 -- VIEW
@@ -468,6 +476,35 @@ resetActor a =
         , numPizzasWanted = "0"
     }
 
+updateAiActor : Bool -> Bool -> Actor -> Actor
+updateAiActor didBeerPriceDecrease didPizzaPriceDecrease actor =
+    let 
+       adjustNumBeersWanted = if didBeerPriceDecrease then 1 else (-1)
+       adjustNumPizzasWanted = if didPizzaPriceDecrease then 1 else (-1)
+       adjustHoursToWork = 
+          case actor.wc of 
+            "pizza" -> 
+               if didPizzaPriceDecrease then (-1) else 1
+            _ ->
+               if didBeerPriceDecrease then (-1) else 1
+    in
+      { actor
+          | numBeersWanted = (quickIntConvert actor.numBeersWanted) + adjustNumBeersWanted |> String.fromInt
+          , numPizzasWanted = (quickIntConvert actor.numPizzasWanted) + adjustNumPizzasWanted |> String.fromInt
+          , hoursToWork = (quickIntConvert actor.hoursToWork) + adjustHoursToWork |> String.fromInt
+      }
+
+updateAiActors : Model -> List Actor
+updateAiActors model =
+    let 
+      oldBeerPrice = model.beerPrice
+      oldPizzaPrice = model.pizzaPrice
+      newPizzaPrice = adjustPrice "pizza" model
+      newBeerPrice = adjustPrice "beer" model
+      didBeerPriceDecrease = oldBeerPrice > newBeerPrice
+      didPizzaPriceDecrease = oldPizzaPrice > newPizzaPrice
+    in 
+      List.map (updateAiActor didBeerPriceDecrease didPizzaPriceDecrease) model.actors
 
 sumWorkHours : String -> List Actor -> String
 sumWorkHours t actors =
@@ -657,6 +694,12 @@ showStatsTables model =
             else
                 div [] []
 
+        iterationAiButton =
+            if isIterationComplete == True && isIterationSuccessful == False then
+                button [ onClick ResetAiIteration ] [ text "AI--Iterate" ]
+            else
+                div [] []
+
         tdStyle =
             [ style "border" "1px solid #ddd"
             , style "padding" "8px"
@@ -765,6 +808,8 @@ showStatsTables model =
                     ]
                 , p [] []
                 , iterationButton
+                , p [] []
+                , iterationAiButton
                 ]
             ]
         ]
@@ -863,7 +908,8 @@ instructions : String
 instructions =
     """
 This is a computerized version of the Participatory Economics Classroom Simulator (PECS),
-programmed by Mitchell Szczepanczyk, devised by Justin Jarvis, and based on the economic model of a participatory economy co-invented by Michael Albert and Robin Hahnel.
+programmed by Mitchell Szczepanczyk, devised by Justin Jarvis, and based on the economic 
+model of a participatory economy co-invented by Michael Albert and Robin Hahnel.
 
 A participatory economy is an economic model of democratic planning, where participants craft
 a society-wide production, consumption, and allocation plan -- without the retentionist
