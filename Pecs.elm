@@ -328,6 +328,14 @@ viewCouncil councilType actor =
             ]
 
 
+numActors : String -> String -> List Actor -> String
+numActors councilType councilId actors =
+  case councilType of
+    "wc" ->
+      List.filter (\x -> x.wc == councilId) actors |> List.length |> toString
+    _ ->
+      List.filter (\x -> x.cc == councilId) actors |> List.length |> toString
+
 viewCCQuestions : Model -> Html Msg
 viewCCQuestions model =
     let
@@ -782,12 +790,14 @@ showStatsTables model =
                 , table []
                     [ tr []
                         [ th thStyle [ text "CC" ]
+                        , th thStyle [ text "#" ]
                         , th thStyle [ text "Budget" ]
                         , th thStyle [ text "Surplus" ]
                         , th thStyle [ text "OK?" ]
                         ]
                     , tr []
                         [ td tdStyle [ text "CC1" ]
+                        , td tdStyle [ text (numActors "cc" "1" model.actors)]
                         , td tdStyle [ text cc1budget ]
                         , td tdStyle [ text (toString cc1BudgetSurplus) ]
                         , td tdStyle
@@ -797,6 +807,7 @@ showStatsTables model =
                         ]
                     , tr []
                         [ td tdStyle [ text "CC2" ]
+                        , td tdStyle [ text (numActors "cc" "2" model.actors)]
                         , td tdStyle [ text cc2budget ]
                         , td tdStyle [ text (toString cc2BudgetSurplus) ]
                         , td tdStyle
@@ -806,6 +817,7 @@ showStatsTables model =
                         ]
                     , tr []
                         [ td tdStyle [ text "CC3" ]
+                        , td tdStyle [ text (numActors "cc" "3" model.actors)]
                         , td tdStyle [ text cc3budget ]
                         , td tdStyle [ text (toString cc3BudgetSurplus) ]
                         , td tdStyle
@@ -818,14 +830,17 @@ showStatsTables model =
                 , table []
                     [ tr []
                         [ th thStyle [ text "WC" ]
+                        , th thStyle [ text "#" ]
                         , th thStyle [ text "Hours" ]
                         ]
                     , tr []
                         [ td tdStyle [ text "Pizza" ]
+                        , td tdStyle [ text (numActors "wc" "pizza" model.actors)]
                         , td tdStyle [ text pizzaHours ]
                         ]
                     , tr []
                         [ td tdStyle [ text "Beer" ]
+                        , td tdStyle [ text (numActors "wc" "beer" model.actors)]
                         , td tdStyle [ text beerHours ]
                         ]
                     ]
