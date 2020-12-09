@@ -54,7 +54,7 @@ type alias Model =
 
 init : Model
 init =
-    Model [] 10.0 10.0 "" "" "" "" "" "" "" "" 0 [] 0
+    Model [] 10.0 10.0 "" "" "" "" "" "" "" "" 0 [] 1
 
 
 newActor : Int -> String -> String -> String -> Int -> String -> Actor
