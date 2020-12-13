@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, text, p, table, tr, td, th, h2, br, b, input, select, option)
+import Html exposing (Html, button, div, text, p, table, tr, td, th, h3, br, b, input, select, option)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
@@ -490,42 +490,55 @@ resetActor a =
     }
 
 
-updateAiActor : Bool -> Bool -> Actor -> Actor
-updateAiActor didBeerPriceDecrease didPizzaPriceDecrease actor =
+updateAiActor : Bool -> Bool -> Bool -> Bool -> Float -> Float -> Float -> Actor -> Actor
+updateAiActor didBeerPriceDecrease didPizzaPriceDecrease beerRangeResult pizzaRangeResult cc1BudgetSurplus cc2BudgetSurplus cc3BudgetSurplus actor =
     let
         adjustNumBeersWanted =
-            if didBeerPriceDecrease then
-                1
+            if beerRangeResult == True then
+              0
             else
-                (-1)
+              if didBeerPriceDecrease then
+                  1
+              else
+                  (-1)
 
         adjustNumPizzasWanted =
-            if didPizzaPriceDecrease then
-                1
+            if pizzaRangeResult == True then
+               0
             else
-                (-1)
+              if didPizzaPriceDecrease then
+                  1
+              else
+                  (-1)
 
         adjustHoursToWork =
             case actor.wc of
                 "pizza" ->
-                    if didPizzaPriceDecrease then
-                        (-1)
+                    if pizzaRangeResult == True then
+                       0
                     else
-                        1
+                      if didPizzaPriceDecrease then
+                          (-1)
+                      else
+                          1
 
                 _ ->
-                    if didBeerPriceDecrease then
-                        (-1)
+                    if beerRangeResult == True then
+                      0
                     else
-                        1
+                      if didBeerPriceDecrease then
+                          (-1)
+                      else
+                          1
     in
         { actor
-            | numBeersWanted = (quickIntConvert actor.numBeersWanted) + adjustNumBeersWanted |> String.fromInt
-            , numPizzasWanted = (quickIntConvert actor.numPizzasWanted) + adjustNumPizzasWanted |> String.fromInt
-            , hoursToWork = (quickIntConvert actor.hoursToWork) + adjustHoursToWork |> String.fromInt
+--            | numBeersWanted = (quickIntConvert actor.numBeersWanted) + adjustNumBeersWanted |> String.fromInt
+--            , numPizzasWanted = (quickIntConvert actor.numPizzasWanted) + adjustNumPizzasWanted |> String.fromInt
+            | hoursToWork = (quickIntConvert actor.hoursToWork) + adjustHoursToWork |> String.fromInt
         }
 
 
+-- TODO Dedup me!
 updateAiActors : Model -> List Actor
 updateAiActors model =
     let
@@ -546,8 +559,66 @@ updateAiActors model =
 
         didPizzaPriceDecrease =
             oldPizzaPrice > newPizzaPrice
+
+        pizzaHours =
+            sumWorkHours "pizza" model.actors
+
+        beerHours =
+            sumWorkHours "beer" model.actors
+
+        pizzaSupply =
+            calculatePizzaSupply pizzaHours
+
+        beerSupply =
+            beerHours
+
+        pizzaDemand =
+            calculateDemand "pizza" model.actors
+
+        beerDemand =
+            calculateDemand "beer" model.actors
+
+        hiLoSum =
+            model.actors
+                |> List.map .hiLo
+                |> List.map String.toInt
+                |> List.map (Maybe.withDefault 0)
+                |> List.foldl (+) 0
+
+        hiLoAvg =
+            (toFloat hiLoSum) / (toFloat (List.length model.actors)) |> String.fromFloat
+
+        cc1budget =
+            computeCcBudget "1" hiLoAvg model.actors
+
+        cc2budget =
+            computeCcBudget "2" hiLoAvg model.actors
+
+        cc3budget =
+            computeCcBudget "3" hiLoAvg model.actors
+
+        ( beerRangeResult, _ ) =
+            priceRangeFunction beerDemand beerSupply
+
+        ( pizzaRangeResult, _ ) =
+            priceRangeFunction pizzaDemand pizzaSupply
+
+        cc1BudgetSurplus =
+            (quickFloatConvert cc1budget)
+                - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "beer" model.actors)))
+                - (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "pizza" model.actors)))
+
+        cc2BudgetSurplus =
+            (quickFloatConvert cc2budget)
+                - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "beer" model.actors)))
+                - (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "pizza" model.actors)))
+
+        cc3BudgetSurplus =
+            (quickFloatConvert cc3budget)
+                - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "3" "beer" model.actors)))
+                - (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "3" "pizza" model.actors)))
     in
-        List.map (updateAiActor didBeerPriceDecrease didPizzaPriceDecrease) model.actors
+        List.map (updateAiActor didBeerPriceDecrease didPizzaPriceDecrease beerRangeResult pizzaRangeResult cc1BudgetSurplus cc2BudgetSurplus cc3BudgetSurplus) model.actors
 
 
 sumWorkHours : String -> List Actor -> String
@@ -758,7 +829,8 @@ showStatsTables model =
     in
         [ td [ style "vertical-align" "text-top" ]
             [ div []
-                [ table []
+                [ p [] [iterationButton, iterationAiButton]
+                  , table []
                     [ tr []
                         [ th thStyle [ text "Goods" ]
                         , th thStyle [ text "Price" ]
@@ -859,10 +931,7 @@ showStatsTables model =
                         , td tdStyle [ text (toString model.iteration) ]
                         ]
                     ]
-                , p [] []
-                , iterationButton
-                , p [] []
-                , iterationAiButton
+
                 ]
             ]
         ]
@@ -890,7 +959,7 @@ viewCouncils model =
             [ tr []
                 (List.append (showStatsTables model)
                     [ td
-                        [ style "padding" "30px"
+                        [ style "padding" "20px"
                         , style "vertical-align" "text-top"
                         ]
                         [ p [] [ text "Workers Council - Pizza:" ]
@@ -1038,15 +1107,15 @@ view model =
                         [ onClick ShowCouncilsPane ]
                         [ text "Show Stats / Councils" ]
                     , button
-                        [ onClick ShowDebugPane ]
-                        [ text "Debug" ]
-                    , button
                         [ onClick ApplyTestActors ]
                         [ text "Test Actors" ]
+                    , button
+                        [ onClick ShowDebugPane ]
+                        [ text "Debug" ]
                     ]
                 ]
             , td []
-                [ h2 [] [ text "Participatory Economics Classroom Simulator" ]
+                [ h3 [] [ text "Participatory Economics Classroom Simulator" ]
                 , case model.currentPane of
                     "AddActor" ->
                         viewAddActorForm model
