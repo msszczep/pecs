@@ -471,7 +471,7 @@ priceRangeFunction val1 val2 =
             maxQty * 0.9
 
         isInRange =
-            minQty < maxFinalRange && minQty > minFinalRange
+            minQty <= maxFinalRange && minQty >= minFinalRange
     in
         ( isInRange, ( String.fromFloat minFinalRange, String.fromFloat maxFinalRange ) )
 
