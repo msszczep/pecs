@@ -752,6 +752,10 @@ showStatsTables model =
             else
                 ( "FAIL", "red" )
 
+        cc1Costs =
+            (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "beer" model.actors)))
+            + (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "pizza" model.actors)))
+
         cc1BudgetSurplus =
             (quickFloatConvert cc1budget)
                 - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "1" "beer" model.actors)))
@@ -763,6 +767,10 @@ showStatsTables model =
             else
                 ( "FAIL", "red" )
 
+        cc2Costs =
+            (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "beer" model.actors)))
+            + (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "pizza" model.actors)))
+
         cc2BudgetSurplus =
             (quickFloatConvert cc2budget)
                 - (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "2" "beer" model.actors)))
@@ -773,6 +781,10 @@ showStatsTables model =
                 ( "OK", "green" )
             else
                 ( "FAIL", "red" )
+
+        cc3Costs =
+            (model.beerPrice * (quickFloatConvert (demandsByCouncilAndGood "3" "beer" model.actors)))
+            + (model.pizzaPrice * (quickFloatConvert (demandsByCouncilAndGood "3" "pizza" model.actors)))
 
         cc3BudgetSurplus =
             (quickFloatConvert cc3budget)
@@ -868,6 +880,7 @@ showStatsTables model =
                         [ th thStyle [ text "CC" ]
                         , th thStyle [ text "#Actors" ]
                         , th thStyle [ text "Budget" ]
+                        , th thStyle [ text "Costs" ]
                         , th thStyle [ text "Surplus" ]
                         , th thStyle [ text "OK?" ]
                         ]
@@ -875,6 +888,7 @@ showStatsTables model =
                         [ td tdStyle [ text "CC1" ]
                         , td tdStyle [ text (numActors "cc" "1" model.actors) ]
                         , td tdStyle [ text cc1budget ]
+                        , td tdStyle [ text (toString cc1Costs) ]
                         , td tdStyle [ text (toString cc1BudgetSurplus) ]
                         , td tdStyle
                             [ b [ style "color" cc1BudgetSurplusStyle ]
@@ -885,6 +899,7 @@ showStatsTables model =
                         [ td tdStyle [ text "CC2" ]
                         , td tdStyle [ text (numActors "cc" "2" model.actors) ]
                         , td tdStyle [ text cc2budget ]
+                        , td tdStyle [ text (toString cc2Costs) ]
                         , td tdStyle [ text (toString cc2BudgetSurplus) ]
                         , td tdStyle
                             [ b [ style "color" cc2BudgetSurplusStyle ]
@@ -895,6 +910,7 @@ showStatsTables model =
                         [ td tdStyle [ text "CC3" ]
                         , td tdStyle [ text (numActors "cc" "3" model.actors) ]
                         , td tdStyle [ text cc3budget ]
+                        , td tdStyle [ text (toString cc3Costs) ]
                         , td tdStyle [ text (toString cc3BudgetSurplus) ]
                         , td tdStyle
                             [ b [ style "color" cc3BudgetSurplusStyle ]
