@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (value, placeholder, style)
 import Debug exposing (toString)
 import Tuple exposing (first, second)
-import Markdown
+import Markdown exposing (toHtml)
 import Random
 
 
@@ -1152,7 +1152,7 @@ view model =
                         p [] [ text (toString model) ]
 
                     _ ->
-                        Markdown.toHtml
+                        toHtml
                             [ style "padding" "20px"
                             ]
                             instructions
